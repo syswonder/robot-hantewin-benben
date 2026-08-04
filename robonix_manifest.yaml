@@ -64,9 +64,9 @@ system:
     listen: 127.0.0.1:50071
     log: info
     vlm:
-      upstream: http://token-hub.lol
-      api_key: sk-442tmVkgFlK4euZFW5p3S3zQhOijq8HJrlP7FqQRjctaJ19T
-      model: qwen3.6-flash
+      upstream: api.openai.com
+      api_key: youkey
+      model: gpt-5
       api_format: openai
   soma:
     robot_yaml: ./soma.yaml
@@ -145,7 +145,7 @@ primitive:
   - name: benben_chassis
     path: ./primitives/chassis
     config:
-      token: gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+      token: auth_token
       odom_frame: odom
       base_frame: base_link
       odom_topic: /odom
