@@ -1,0 +1,13 @@
+2026_08_03-13:49:38 [D] [<UNNAME>] start init ...
+2026_08_03-13:49:38 [D] [<UNNAME>] gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+2026_08_03-13:49:38 [I] [client] socket connect = 1 kConnecting = 0 kConnected = 1 kDisconnecting = 2 kDisconnected = 3
+2026_08_03-13:49:38 [W] [manage-CreateClient] 需要创建client Index = 1
+2026_08_03-13:49:38 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-13:49:38 [W] [manage-CreateClient] 需要创建client Index = 2
+2026_08_03-13:49:43 [D] [client] disconnect from 192.168.10.1:8090
+2026_08_03-13:49:43 [I] [client] socket close = 3
+2026_08_03-13:49:53 [W] [manage-listenClient] 发送心跳
+2026_08_03-13:49:53 [D] [manage-listenClient] 还未授权成功，请求中
+2026_08_03-13:50:08 [E] [manage-listenClient] SDK授权,请求失败
+2026_08_03-13:50:08 [D] [manage-listenClient] Not authorized (failCount=1/3)
+2026_08_03-13:50:08 [W] [manage-listenClient] 断联：开始释放资源

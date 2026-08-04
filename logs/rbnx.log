@@ -1,0 +1,5 @@
+{"ts":"2026-07-22 16:30:51.300350498","level":"warn","tag":"rbnx","msg":"liaison discovery timed out (liaison not found in Atlas after 60s: connect to Atlas at 'http://localhost:50051': transport error: tcp connect error: tcp connect error: Connection refused (os error 111)), falling back to http://127.0.0.1:50081"}
+{"ts":"2026-07-24 16:44:08.769368228","level":"info","tag":"rbnx","msg":"Running package::robonix.primitive.livox.mid360.lidar (PID 299731)"}
+{"ts":"2026-07-29 14:05:39.714478084","level":"info","tag":"rbnx","msg":"shutdown mapping via Driver(CMD_SHUTDOWN): terminated"}
+{"ts":"2026-07-29 14:05:40.838004649","level":"info","tag":"rbnx","msg":"shutdown mapping manifest stop hook completed"}
+{"ts":"2026-07-29 14:05:58.775552719","level":"info","tag":"rbnx","msg":"shutdown scene manifest stop hook completed"}

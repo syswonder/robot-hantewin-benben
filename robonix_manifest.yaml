@@ -1,0 +1,205 @@
+manifestVersion: 1
+name: robonix-hty
+
+catalog:
+  name: robonix.robot.hty_robot
+  version: 0.1.0
+  description: "TODO: describe this robot deployment."
+  tags:
+    - robot
+    - deploy
+    - robonix
+  maintainers:
+    - Your Name <you@example.com>
+
+env:
+  LOG: "INFO"
+  ROS_DOMAIN_ID: "0"
+  # RMW_IMPLEMENTATION: rmw_zenoh_cpp
+  SCENE_NATIVE_PYTHON: /home/hty/pyenv/env/bin/python3
+  # hf-mirror.com 302/308-redirects Xet-backed files (like this CLIP
+  # checkpoint) cross-domain back to huggingface.co; huggingface_hub only
+  # follows same-domain redirects when fetching HEAD metadata, so the mirror
+  # fails with a misleading "check your firewall" error. Direct access works.
+  HF_ENDPOINT: https://huggingface.co
+  PIP_USER: "0"
+  RBNX_BUILD_TARGET: jetson-native
+  ROBONIX_SCENE_FORCE: native
+  ROBONIX_SCENE_PLATFORM: jetson_thor
+  ROBONIX_SCENE_ROS_DISTRO: jazzy
+  # SCENE_NATIVE_PYTHON: python3
+  SCENE_WEB_PORT: "50107"
+  ROBONIX_MAPPING_FORCE: native
+  ROBONIX_MAPPING_PLATFORM: jetson_thor
+  MAPPING_WEBUI_PORT: "8091"
+  # Exposes unauthenticated map save/load/pose-estimate operations on the
+  # network -- only enable on a trusted LAN.
+  MAPPING_WEBUI_HOST: "0.0.0.0"
+  ROBONIX_NAV2_FORCE: native
+  ROBONIX_NAV2_PLATFORM: jetson_thor
+  SCENE_MAP_ID: 27f
+  SCENE_RESTORE_ON_START: "true"
+  MAPPING_MAPS_DIR: ${HOME}/.robonix/maps
+  # load_map verify: rtabmap regenerates the grid slightly differently on DB
+  # reload (boundary/unknown cells), so the stock 0.999/0.995 thresholds reject
+  # every legit load (v2_27f measured agreement=0.991 occ=0.971 free=0.967).
+  # Relaxed so a correctly-loaded map passes while a genuinely wrong map still
+  # fails (map_ops.py env overrides MAPPING_LOAD_MIN_CELL_AGREEMENT/_MIN_CLASS_IOU).
+  MAPPING_LOAD_MIN_CELL_AGREEMENT: "0.95"
+  MAPPING_LOAD_MIN_CLASS_IOU: "0.90"
+  SCENE_OBJECT_MEMORY_DB: ${HOME}/.robonix/scene/objects.db
+  SCENE_GRAPH_CACHE_DIR: ${HOME}/.robonix/scene/graph
+  SCENE_ANNOTATIONS_DIR: ${HOME}/.robonix/scene/annotations
+  SPEECH_BACKEND: tencent
+  ROS_DISTRO: jazzy
+
+system:
+  atlas:
+    listen: 127.0.0.1:50051
+    log: info
+  executor:
+    listen: 127.0.0.1:50061
+    log: info
+  pilot:
+    listen: 127.0.0.1:50071
+    log: info
+    vlm:
+      upstream: http://token-hub.lol
+      api_key: sk-442tmVkgFlK4euZFW5p3S3zQhOijq8HJrlP7FqQRjctaJ19T
+      model: qwen3.6-flash
+      api_format: openai
+  soma:
+    robot_yaml: ./soma.yaml
+    listen: 127.0.0.1:50091
+    log: info
+  liaison:
+    listen: 0.0.0.0:50081
+    log: info
+  scene:
+    log: info
+    camera_provider_id: realsense_camera
+    web_port: 50107 
+primitive: 
+  - name: mid360_lidar
+    path: ./primitives/primitive-livox-mid360-lidar-rbnx
+    config:
+      lidar_ip: 192.168.1.133
+      host_ip: 192.168.1.50             
+      publish_freq: 10.0
+      frame_id: livox_frame
+      parent_frame: base_link
+      extrinsics:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
+        # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
+        yaw: 0
+
+  - name: lakibeam1_lidar
+    path: /home/hty/robot-hantewin-benben/primitives/lakiBeam1-lidar
+    config:
+      # lidar_ip: 192.168.1.133
+      # host_ip: 192.168.1.50     
+      ros1_publisher_uri: http://192.168.10.1:40487/
+      scan_hz: 20.0 
+      scan_topic: /scan
+      frame_id: laser
+      parent_frame: base_link
+      extrinsics:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
+        # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
+        yaw: 0.0
+
+  - name: mid360_imu
+    path: ./primitives/primitive-livox-mid360-imu-rbnx
+    config: {}
+
+  - name: realsense_camera
+    url: https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx.git
+    branch: main
+    config:
+      camera_name:        "camera_435i"
+      rgb_profile:        "640x480x30"
+      depth_profile:      "848x480x30"
+      align_depth:        true
+      enable_imu:         false
+      enable_sync:        true
+      sentinel_timeout_s: 30.0
+
+
+  # Publishes the Soma-owned Lite3 URDF as /robot_description and the standard
+  # TF tree. Soma remains the single authoritative source for the robot model.
+  - name: robot_description
+    url: https://github.com/syswonder/primitive-robot-description-rbnx
+    branch: main
+    manifest: package_manifest.native.yaml
+
+  - name: benben_chassis
+    path: ./primitives/chassis
+    config:
+      token: gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+      odom_frame: odom
+      base_frame: base_link
+      odom_topic: /odom
+      odom_hz: 30
+      ros1_odom_publisher_uri: http://192.168.10.1:45173/
+service:
+  - name: mapping
+    path: /home/hty/robonix/services/service-map-rbnx
+    manifest: package_manifest.jetson-native.yaml
+    config:
+      map_id: 27f
+      sensor_providers:
+        lidar3d: mid360_lidar
+        lidar2d: lakibeam1_lidar
+        imu: mid360_imu
+        odom: benben_chassis
+        # rgb: realsense_camera
+        # depth: realsense_camera
+      algo: rtabmap
+      map_mode: localization # localization
+      deskew_lidar: true
+      params_file: config/rtabmap_params.yaml
+      lidar_frame: livox_frame
+      # lidar_base_extrinsic:
+      #   x: 0.0
+      #   y: 0.0
+      #   z: 0.0
+      #   roll: 0.0
+      #   pitch: 0.0
+      #   yaw: 0.0
+      # rtabmap_params:
+      #   Grid/FootprintLength: 0.84
+      #   Grid/FootprintWidth: 0.60
+
+
+  - name: nav2
+    path: ./rbnx-boot/cache/service-navigation-rbnx
+    manifest: package_manifest.jetson-native.yaml
+    config:
+      params_file: config/nav2_params.yaml
+      bt_xml_file: config/navigate.xml
+      scan_projection:
+        enabled: true
+        min_height_m: 0.30
+        max_height_m: 1.40
+        range_max_m: 12.0
+        self_filter_margin_m: 0.05
+      action_wait_s: 80.0
+      provider_ids:
+        map: mapping
+        # Canonical odom owner. Replace with a declared Mid360 LIO provider
+        # only after that provider exists and passes the static-drift gate.
+        odom: benben_chassis
+        scan_cloud: mid360_lidar
+          
+
+skill: []

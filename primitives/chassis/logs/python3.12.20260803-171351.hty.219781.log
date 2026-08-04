@@ -1,0 +1,91 @@
+2026_08_03-17:13:51 [D] [<UNNAME>] start init ...
+2026_08_03-17:13:51 [D] [<UNNAME>] gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+2026_08_03-17:13:51 [I] [client] socket connect = 1 kConnecting = 0 kConnected = 1 kDisconnecting = 2 kDisconnected = 3
+2026_08_03-17:13:51 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-17:13:51 [W] [manage-CreateClient] 需要创建client Index = 1
+2026_08_03-17:13:51 [W] [analysis] RxFlg.store(1)---serial_number = 0 check_sn = 0
+2026_08_03-17:13:51 [W] [analysis] cv通知下发---serial_number = 0 check_sn = 0
+2026_08_03-17:13:51 [E] [analysis] [auth=0]:未授权
+2026_08_03-17:13:51 [E] [analysis] [auth=0]:未授权
+2026_08_03-17:13:51 [D] [manage-listenClient] 还未授权成功，请求中
+2026_08_03-17:13:51 [W] [manage-CreateClient] 需要创建client Index = 2
+2026_08_03-17:13:51 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-17:13:51 [W] [analysis] RxFlg.store(1)---serial_number = 1 check_sn = 1
+2026_08_03-17:13:51 [W] [analysis] cv通知下发---serial_number = 1 check_sn = 1
+2026_08_03-17:13:51 [D] [manage-listenClient] Random: bxMjTE..., VIN: HTWW312510A000123
+2026_08_03-17:13:51 [I] [manage-listenClient] License verified successfully for VIN: HTWW312510A000123
+2026_08_03-17:13:51 [D] [manage-listenClient] License valid until: 2026-10-15 10:12:20
+2026_08_03-17:13:51 [I] [manage-listenClient] License verified successfully for expiry: 1A0A0F0A0C14
+2026_08_03-17:13:52 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-17:13:52 [W] [analysis] RxFlg.store(1)---serial_number = 2 check_sn = 2
+2026_08_03-17:13:52 [W] [analysis] cv通知下发---serial_number = 2 check_sn = 2
+2026_08_03-17:13:52 [D] [<UNNAME>] brake_ctrl=1
+2026_08_03-17:13:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:01 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:06 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:11 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:16 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:21 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:26 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:31 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:36 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:41 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:46 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:51 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:14:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:01 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:06 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:11 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:16 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:21 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:26 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:31 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:36 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:41 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:46 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:51 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:15:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:01 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:06 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:11 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:16 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:21 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:26 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:31 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:36 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:41 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:46 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:51 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:16:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:01 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:06 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:11 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:16 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:21 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:26 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:31 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:36 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:41 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:46 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:51 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:17:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:01 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:06 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:11 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:16 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:21 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:26 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:31 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:36 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:41 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:46 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:51 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:56 [W] [manage-listenClient] 发送心跳
+2026_08_03-17:18:57 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-17:18:57 [W] [analysis] RxFlg.store(1)---serial_number = 64 check_sn = 64
+2026_08_03-17:18:57 [W] [analysis] cv通知下发---serial_number = 64 check_sn = 64
+2026_08_03-17:18:57 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0
+2026_08_03-17:18:57 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-17:18:57 [W] [analysis] RxFlg.store(1)---serial_number = 65 check_sn = 65
+2026_08_03-17:18:57 [W] [analysis] cv通知下发---serial_number = 65 check_sn = 65
+2026_08_03-17:18:57 [D] [<UNNAME>] brake_ctrl=0

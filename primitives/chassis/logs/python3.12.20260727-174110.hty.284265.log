@@ -1,0 +1,37 @@
+2026_07_27-17:41:10 [D] [<UNNAME>] start init ...
+2026_07_27-17:41:10 [D] [<UNNAME>] gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+2026_07_27-17:41:10 [I] [client] socket connect = 1 kConnecting = 0 kConnected = 1 kDisconnecting = 2 kDisconnected = 3
+2026_07_27-17:41:10 [W] [manage-CreateClient] 需要创建client Index = 1
+2026_07_27-17:41:11 [W] [manage-CreateClient] 需要创建client Index = 2
+2026_07_27-17:41:13 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:14 [W] [analysis] RxFlg.store(1)---serial_number = 0 check_sn = 0
+2026_07_27-17:41:14 [W] [analysis] cv通知下发---serial_number = 0 check_sn = 0
+2026_07_27-17:41:15 [E] [analysis] [auth=0]:未授权
+2026_07_27-17:41:15 [E] [analysis] [auth=0]:未授权
+2026_07_27-17:41:15 [E] [analysis] [auth=0]:未授权
+2026_07_27-17:41:15 [E] [analysis] [auth=0]:未授权
+2026_07_27-17:41:15 [W] [manage-listenClient] 发送心跳
+2026_07_27-17:41:15 [D] [manage-listenClient] 还未授权成功，请求中
+2026_07_27-17:41:15 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:16 [W] [analysis] RxFlg.store(1)---serial_number = 2 check_sn = 2
+2026_07_27-17:41:16 [W] [analysis] cv通知下发---serial_number = 2 check_sn = 2
+2026_07_27-17:41:16 [D] [manage-listenClient] Random: bxMjTE..., VIN: HTWW312510A000123
+2026_07_27-17:41:16 [I] [manage-listenClient] License verified successfully for VIN: HTWW312510A000123
+2026_07_27-17:41:16 [D] [manage-listenClient] License valid until: 2026-10-15 10:12:20
+2026_07_27-17:41:16 [I] [manage-listenClient] License verified successfully for expiry: 1A0A0F0A0C14
+2026_07_27-17:41:16 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:16 [W] [analysis] RxFlg.store(1)---serial_number = 3 check_sn = 3
+2026_07_27-17:41:16 [W] [analysis] cv通知下发---serial_number = 3 check_sn = 3
+2026_07_27-17:41:16 [D] [<UNNAME>] brake_ctrl=1
+2026_07_27-17:41:16 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:16 [W] [analysis] RxFlg.store(1)---serial_number = 4 check_sn = 4
+2026_07_27-17:41:16 [W] [analysis] cv通知下发---serial_number = 4 check_sn = 4
+2026_07_27-17:41:16 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0
+2026_07_27-17:41:16 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:16 [W] [analysis] RxFlg.store(1)---serial_number = 5 check_sn = 5
+2026_07_27-17:41:16 [W] [analysis] cv通知下发---serial_number = 5 check_sn = 5
+2026_07_27-17:41:16 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0
+2026_07_27-17:41:17 [D] [<UNNAME>] Connection::kConnected
+2026_07_27-17:41:17 [W] [analysis] RxFlg.store(1)---serial_number = 6 check_sn = 6
+2026_07_27-17:41:17 [W] [analysis] cv通知下发---serial_number = 6 check_sn = 6
+2026_07_27-17:41:17 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0

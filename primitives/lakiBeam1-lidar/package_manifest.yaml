@@ -1,0 +1,33 @@
+# LakiBeam1 lidar primitive for Hantewin BenBen.
+#
+# One device = one package. This driver owns the 2D planar lidar surface:
+#   robonix/primitive/lidar/lidar     -> ROS2 topic_out (sensor_msgs/LaserScan, /scan)
+#   robonix/primitive/lidar/snapshot  -> MCP one-shot LaserScan capture
+#   robonix/primitive/lidar/driver    -> gRPC LifecycleDriver.Driver(INIT/...)
+#
+# The LakiBeam1 publishes sensor_msgs/LaserScan on a remote ROS1 node
+# (/richbeam_lidar -> /scan_filter). This driver bridges that stream to
+# ROS 2 via direct TCPROS subscription - the same pattern used by the
+# chassis driver for /odom. No ROS 1 environment is required on the host.
+#
+# Lifecycle: start.sh launches the atlas bridge ONLY. `rbnx boot` then
+# calls Driver(CMD_INIT, config_json) - that handler starts the ROS1
+# TCPROS receiver, waits for the first LaserScan, creates the ROS 2
+# publisher + timer, and only then returns ok.
+manifestVersion: 1
+
+package:
+  name: robonix.primitive.richbeam.lakibeam1.lidar
+  version: 0.1.0
+  description: LakiBeam1 2D lidar driver - ROS1 TCPROS LaserScan bridge to ROS2.
+  tags: [primitive, lidar, richbeam, lakibeam1, laserscan]
+  maintainers: [wheatfox <wheatfox17@icloud.com>]
+  license: MulanPSL-2.0
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+capabilities:
+  - name: robonix/primitive/lidar/lidar
+  - name: robonix/primitive/lidar/snapshot
+  - name: robonix/primitive/lidar/driver

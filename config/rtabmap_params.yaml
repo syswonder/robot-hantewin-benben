@@ -1,0 +1,33 @@
+# Copy this file into the robot deployment repository. The Mapping service does
+# not load this template at runtime; set config.params_file to the copied path.
+RGBD/CreateOccupancyGrid: true
+# Apply localization loop-closure corrections immediately instead of waiting
+# for a second confirming match (RGBD/MaxOdomCacheSize>0). With a stationary
+# robot the confirmation never arrives, so the map→odom correction stays
+# pending and /map keeps showing a local window instead of the loaded full map.
+RGBD/MaxOdomCacheSize: 0
+# Load ALL saved nodes into working memory whenever a database is opened, even
+# when the service started in mapping mode (the launch only enables this for
+# launch-time localization). Without it, a runtime load keeps InitWMWithAllNodes
+# false, so /map is rebuilt from live sensor data only — a ~6 m local window
+# instead of the loaded full map. No effect on a fresh ephemeral mapping DB.
+Mem/InitWMWithAllNodes: true
+Grid/RangeMax: 6.0
+Grid/CellSize: 0.05
+Grid/RayTracing: true
+Grid/3D: false
+Grid/NormalsSegmentation: false
+Grid/MaxObstacleHeight: 1.0
+Grid/MaxGroundHeight: 0.1
+Reg/Strategy: 1
+Reg/Force3DoF: true
+Optimizer/Strategy: 1
+RGBD/NeighborLinkRefining: true
+RGBD/ProximityBySpace: true
+RGBD/AngularUpdate: 0.1
+RGBD/LinearUpdate: 0.1
+Vis/MinInliers: 12
+Rtabmap/DetectionRate: 1.0
+Icp/MaxCorrespondenceDistance: 0.2
+Icp/MaxTranslation: 0.5
+Icp/MaxRotation: 0.78

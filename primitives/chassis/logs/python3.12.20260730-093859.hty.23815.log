@@ -1,0 +1,74 @@
+2026_07_30-09:38:59 [D] [<UNNAME>] start init ...
+2026_07_30-09:38:59 [D] [<UNNAME>] gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+2026_07_30-09:38:59 [I] [client] socket connect = 1 kConnecting = 0 kConnected = 1 kDisconnecting = 2 kDisconnected = 3
+2026_07_30-09:38:59 [W] [manage-CreateClient] 需要创建client Index = 1
+2026_07_30-09:38:59 [D] [<UNNAME>] Connection::kConnected
+2026_07_30-09:38:59 [W] [analysis] RxFlg.store(1)---serial_number = 0 check_sn = 0
+2026_07_30-09:38:59 [W] [analysis] cv通知下发---serial_number = 0 check_sn = 0
+2026_07_30-09:38:59 [E] [analysis] [auth=0]:未授权
+2026_07_30-09:38:59 [E] [analysis] [auth=0]:未授权
+2026_07_30-09:38:59 [E] [analysis] [auth=0]:未授权
+2026_07_30-09:38:59 [E] [analysis] [auth=0]:未授权
+2026_07_30-09:38:59 [D] [manage-listenClient] 还未授权成功，请求中
+2026_07_30-09:38:59 [D] [<UNNAME>] Connection::kConnected
+2026_07_30-09:38:59 [W] [manage-CreateClient] 需要创建client Index = 2
+2026_07_30-09:38:59 [W] [analysis] RxFlg.store(1)---serial_number = 1 check_sn = 1
+2026_07_30-09:38:59 [W] [analysis] cv通知下发---serial_number = 1 check_sn = 1
+2026_07_30-09:38:59 [D] [manage-listenClient] Random: bxMjTE..., VIN: HTWW312510A000123
+2026_07_30-09:38:59 [I] [manage-listenClient] License verified successfully for VIN: HTWW312510A000123
+2026_07_30-09:38:59 [D] [manage-listenClient] License valid until: 2026-10-15 10:12:20
+2026_07_30-09:38:59 [I] [manage-listenClient] License verified successfully for expiry: 1A0A0F0A0C14
+2026_07_30-09:39:00 [D] [<UNNAME>] Connection::kConnected
+2026_07_30-09:39:00 [W] [analysis] RxFlg.store(1)---serial_number = 2 check_sn = 2
+2026_07_30-09:39:00 [W] [analysis] cv通知下发---serial_number = 2 check_sn = 2
+2026_07_30-09:39:00 [D] [<UNNAME>] brake_ctrl=1
+2026_07_30-09:39:04 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:09 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:14 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:19 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:24 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:29 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:34 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:39 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:44 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:49 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:54 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:39:59 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:04 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:09 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:14 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:19 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:24 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:29 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:34 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:39 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:44 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:49 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:54 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:40:59 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:04 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:09 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:14 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:19 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:24 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:29 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:34 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:39 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:44 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:49 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:54 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:41:59 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:04 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:09 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:14 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:19 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:24 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:29 [W] [manage-listenClient] 发送心跳
+2026_07_30-09:42:33 [D] [<UNNAME>] Connection::kConnected
+2026_07_30-09:42:33 [W] [analysis] RxFlg.store(1)---serial_number = 45 check_sn = 45
+2026_07_30-09:42:33 [W] [analysis] cv通知下发---serial_number = 45 check_sn = 45
+2026_07_30-09:42:33 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0
+2026_07_30-09:42:33 [D] [<UNNAME>] Connection::kConnected
+2026_07_30-09:42:34 [W] [analysis] RxFlg.store(1)---serial_number = 46 check_sn = 46
+2026_07_30-09:42:34 [W] [analysis] cv通知下发---serial_number = 46 check_sn = 46
+2026_07_30-09:42:34 [D] [<UNNAME>] brake_ctrl=0

@@ -1,0 +1,99 @@
+urdf:
+  path: ./robot.urdf
+  root_link: base_link
+  model_name: hty_robot
+
+robot:
+  id: hty_robot
+  display_name: "HTY BenBen mobile robot"
+  family: mobile_robot
+  root_part: base
+  dimensions: { length_m: 0.84, width_m: 0.60, height_m: 1.0 }
+  footprint:
+    base_frame: base_link
+    points:
+      - [0.42, 0.30]
+      - [0.42, -0.30]
+      - [-0.42, -0.30]
+      - [-0.42, 0.30]
+  mass_kg: 30.0
+  passable_door_width_m: 0.80
+  exports:
+    # mapping service (rtabmap) - SLAM mapping & localization
+    - provider_id: mapping
+      capabilities:
+        - { path: robonix/service/map/occupancy_grid, description: "Publish the occupancy grid map for navigation and visualization." }
+        - { path: robonix/service/map/pointcloud, description: "Publish the 3D point cloud map." }
+        - { path: robonix/service/map/pose, description: "Report the robot pose in the map frame." }
+        - { path: robonix/service/map/odom, description: "Provide odometry fused by the mapping SLAM stack." }
+        - { path: robonix/service/map/lifecycle, description: "Control the mapping service lifecycle (start/stop)." }
+        - { path: robonix/service/map/save_map, description: "Save the current map to disk." }
+        - { path: robonix/service/map/list_maps, description: "List saved maps available for loading." }
+        - { path: robonix/service/map/load_map, description: "Load a previously saved map by ID." }
+        - { path: robonix/service/map/pose_estimate, description: "Set the initial pose estimate for localization." }
+        - { path: robonix/service/map/switch_mode, description: "Switch between mapping and localization modes." }
+    # scene service - object memory & scene graph
+    - provider_id: scene
+      capabilities:
+        - { path: robonix/system/scene/list_objects, description: "List known objects in the current scene." }
+        - { path: robonix/system/scene/goal_near, description: "Check proximity to a named object or location." }
+        - { path: robonix/system/scene/get_scene_graph, description: "Return the scene graph of objects and relations." }
+        - { path: robonix/system/scene/get_object_context, description: "Get contextual information about a specific object." }
+        - { path: robonix/system/scene/list_relations, description: "List spatial relations between objects in the scene." }
+
+  components:
+    - id: base
+      type: mobile_base
+      urdf_link: base_link
+      exports:
+        - provider_id: benben_chassis
+          capabilities:
+            - { path: robonix/primitive/chassis/move, description: "Command chassis motion (velocity/position) via TBox SDK." }
+            - { path: robonix/primitive/chassis/odom, description: "Read wheel odometry from the BenBen chassis controller." }
+            - { path: robonix/primitive/chassis/twist_in, description: "Accept geometry_msgs/Twist velocity commands on /cmd_vel." }
+
+    - id: mid360_lidar
+      type: lidar_3d
+      urdf_link: livox_frame
+      exports:
+        - provider_id: mid360_lidar
+          capabilities:
+            - { path: robonix/primitive/lidar/lidar3d, description: "Publish Livox MID-360 PointCloud2 (PointXYZRTLT) for mapping and obstacle detection." }
+            - { path: robonix/primitive/lidar/lidar_snapshot, description: "Capture a one-shot 3D point cloud scan." }
+
+    - id: mid360_imu
+      type: imu
+      urdf_link: imu_link
+      exports:
+        - provider_id: mid360_imu
+          capabilities:
+            - { path: robonix/primitive/imu/imu, description: "Publish 6-axis IMU data (sensor_msgs/Imu) from the MID-360 built-in IMU." }
+
+    - id: realsense_camera
+      type: rgbd_camera
+      urdf_link: base_link
+      exports:
+        - provider_id: realsense_camera
+          capabilities:
+            - { path: robonix/primitive/camera/rgb, description: "Publish RGB image stream from the D435i camera." }
+            - { path: robonix/primitive/camera/depth, description: "Publish aligned depth image stream from the D435i camera." }
+            - { path: robonix/primitive/camera/extrinsics, description: "Provide the camera transform relative to the robot base." }
+            - { path: robonix/primitive/camera/snapshot, description: "Capture a one-shot RGB image." }
+            - { path: robonix/primitive/camera/depth_snapshot, description: "Capture a one-shot depth image." }
+
+description:
+  summary: "A Hantewin BenBen mobile robot with Livox MID-360 lidar, D435i RGBD camera, chassis control via TBox SDK, SLAM mapping, and scene understanding."
+  can_do:
+    - "Drive using velocity commands (cmd_vel) through the TBox chassis SDK."
+    - "Build 3D occupancy grid and point cloud maps using rtabmap with Livox MID-360 lidar."
+    - "Capture RGB images, depth images, and 3D point cloud scans."
+    - "Localize in a previously built map using rtabmap localization mode."
+    - "Maintain an object memory and scene graph for spatial reasoning."
+  cannot_do:
+    - "Manipulate objects; no arm or gripper is deployed."
+    - "Navigate to 2D goals autonomously; nav2 is not yet configured in this deployment."
+    - "Use audio I/O; no audio primitive is currently deployed."
+  notes:
+    - "Soma serves this file and the referenced URDF; primitive and service startup is driven by robonix_manifest.yaml."
+    - "The MID-360 lidar and IMU share the same physical device but are split into separate primitive packages per robonix's one-namespace-per-package invariant."
+    - "Camera extrinsics are currently referenced to base_link because the URDF does not yet define a dedicated camera link."

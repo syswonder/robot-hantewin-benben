@@ -1,0 +1,55 @@
+2026_08_03-14:33:09 [D] [<UNNAME>] start init ...
+2026_08_03-14:33:09 [D] [<UNNAME>] gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY=
+2026_08_03-14:33:09 [I] [client] socket connect = 1 kConnecting = 0 kConnected = 1 kDisconnecting = 2 kDisconnected = 3
+2026_08_03-14:33:09 [W] [manage-CreateClient] 需要创建client Index = 1
+2026_08_03-14:33:09 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-14:33:09 [W] [analysis] RxFlg.store(1)---serial_number = 0 check_sn = 0
+2026_08_03-14:33:09 [W] [analysis] cv通知下发---serial_number = 0 check_sn = 0
+2026_08_03-14:33:09 [D] [manage-listenClient] 还未授权成功，请求中
+2026_08_03-14:33:09 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-14:33:09 [W] [manage-CreateClient] 需要创建client Index = 2
+2026_08_03-14:33:09 [W] [analysis] RxFlg.store(1)---serial_number = 1 check_sn = 1
+2026_08_03-14:33:09 [W] [analysis] cv通知下发---serial_number = 1 check_sn = 1
+2026_08_03-14:33:09 [D] [manage-listenClient] Random: bxMjTE..., VIN: HTWW312510A000123
+2026_08_03-14:33:09 [I] [manage-listenClient] License verified successfully for VIN: HTWW312510A000123
+2026_08_03-14:33:09 [D] [manage-listenClient] License valid until: 2026-10-15 10:12:20
+2026_08_03-14:33:09 [I] [manage-listenClient] License verified successfully for expiry: 1A0A0F0A0C14
+2026_08_03-14:33:10 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-14:33:10 [W] [analysis] RxFlg.store(1)---serial_number = 2 check_sn = 2
+2026_08_03-14:33:10 [W] [analysis] cv通知下发---serial_number = 2 check_sn = 2
+2026_08_03-14:33:10 [D] [<UNNAME>] brake_ctrl=1
+2026_08_03-14:33:14 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:19 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:24 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:29 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:34 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:39 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:44 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:49 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:54 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:33:59 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:04 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:09 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:14 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:19 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:24 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:29 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:34 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:39 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:44 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:49 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:54 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:34:59 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:04 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:09 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:14 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:19 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:24 [W] [manage-listenClient] 发送心跳
+2026_08_03-14:35:26 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-14:35:26 [W] [analysis] RxFlg.store(1)---serial_number = 30 check_sn = 30
+2026_08_03-14:35:26 [W] [analysis] cv通知下发---serial_number = 30 check_sn = 30
+2026_08_03-14:35:26 [D] [<UNNAME>] linear_speed=0.000000, angular_speed=0.000000, iscanmove=0
+2026_08_03-14:35:26 [D] [<UNNAME>] Connection::kConnected
+2026_08_03-14:35:27 [W] [analysis] RxFlg.store(1)---serial_number = 31 check_sn = 31
+2026_08_03-14:35:27 [W] [analysis] cv通知下发---serial_number = 31 check_sn = 31
+2026_08_03-14:35:27 [D] [<UNNAME>] brake_ctrl=0

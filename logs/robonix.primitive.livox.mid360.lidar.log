@@ -1,0 +1,10 @@
+{"ts":"2026-07-24 16:44:09.830092587","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"Traceback (most recent call last):"}
+{"ts":"2026-07-24 16:44:09.830191975","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"  File \"<frozen runpy>\", line 198, in _run_module_as_main"}
+{"ts":"2026-07-24 16:44:09.830197799","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"  File \"<frozen runpy>\", line 88, in _run_code"}
+{"ts":"2026-07-24 16:44:09.830201790","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"  File \"/home/hty/hty_robot/primitives/primitive-livox-mid360-lidar-rbnx/mid360_driver/main.py\", line 308, in <module>"}
+{"ts":"2026-07-24 16:44:09.830215346","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"    cap.run()"}
+{"ts":"2026-07-24 16:44:09.830242494","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"  File \"/home/hty/robonix/pylib/robonix-api/robonix_api/capability.py\", line 613, in run"}
+{"ts":"2026-07-24 16:44:09.830395325","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"    self._do_bootstrap()"}
+{"ts":"2026-07-24 16:44:09.830410195","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"  File \"/home/hty/robonix/pylib/robonix-api/robonix_api/capability.py\", line 651, in _do_bootstrap"}
+{"ts":"2026-07-24 16:44:09.830530795","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"    import grpc"}
+{"ts":"2026-07-24 16:44:09.830556027","level":"info","tag":"robonix.primitive.livox.mid360.lidar","msg":"ModuleNotFoundError: No module named 'grpc'"}
