@@ -1,0 +1,4 @@
+# 松开夹爪释放手中的物品以交给用户，之后机械臂回到初始位置。
+---
+bool success
+std_msgs/String message

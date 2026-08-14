@@ -3,3 +3,10 @@ rbnx-boot/
 __pycache__/
 *.pyc
 .venv/
+primitives/chassis/chassis_driver/tbox_sdk/lib/libtbox_sdk_cpp.so
+logs/
+*/logs/*
+# secrets — never commit VLM/API keys
+.env
+.env.*
+!*.env.example

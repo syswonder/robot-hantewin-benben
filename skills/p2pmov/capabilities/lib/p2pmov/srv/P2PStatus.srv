@@ -1,0 +1,20 @@
+# robonix/skill/p2pmov/move/status — poll the latest TBox task lifecycle.
+#
+# The TBox SDK reports ONE global task stream (SDK_BACK_TASK_STATU_T via
+# the state callback); `run_id` is informational and empty means "the
+# most recent task". The raw vendor task_state is mapped to a canonical
+# state the executor's poller understands:
+#   0 idle    -> PENDING
+#   1 running -> RUNNING
+#   2 success -> SUCCEEDED
+#   3 paused  -> RUNNING   (not terminal — waiting for resume)
+#   4 failed  -> FAILED
+#   5 canceled-> CANCELED
+string run_id
+---
+bool known          # false if no task status has been reported yet
+string state        # PENDING | RUNNING | SUCCEEDED | FAILED | CANCELED | TIMEOUT
+uint8 task_state    # raw vendor task_state (0..5, see above)
+uint8 run_state     # raw vendor run_state (0 ready, 6 driving-to-goal, ...)
+float64 distance_m  # remaining distance reported by the vendor, -1 if unknown
+string detail       # human-readable

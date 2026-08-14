@@ -1,0 +1,18 @@
+# robonix/skill/p2pmov/move — navigate to a point.
+#
+# Provide EITHER a named point (`point_name`, resolved from the deployment
+# config `points` dict) OR a raw goal coordinate (`x`, `y`, `yaw`).
+# `point_name` wins when both are present.
+#
+# The goal is dispatched via the vendor TBox SDK task_distribution(); the
+# chassis navigates autonomously on its onboard vendor map. Returns
+# immediately with a run_id — poll move/status with that run_id to track
+# arrival; abort with move/cancel.
+string point_name   # key into config points dict; "" = use x/y/yaw
+float64 x           # goal X in the onboard map frame (metres)
+float64 y           # goal Y in the onboard map frame (metres)
+float64 yaw         # goal heading, passed through verbatim (vendor unit)
+---
+bool accepted       # false if not authorized / unknown point / dispatch error
+string run_id       # task handle; pass to move/status and move/cancel
+string message      # human-readable detail (resolved target / error)

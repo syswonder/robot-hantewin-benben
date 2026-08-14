@@ -1,0 +1,10 @@
+# Lifecycle interface required for rbnx boot to call Driver(CMD_INIT).
+[contract]
+id      = "robonix/skill/nero_grasp/driver"
+version = "1"
+kind    = "skill"
+idl     = "lifecycle/srv/Driver.srv"
+description = "Lifecycle control interface for nero_grasp skill."
+
+[mode]
+type = "rpc"

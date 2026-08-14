@@ -1,5 +1,10 @@
 manifestVersion: 1
 name: robonix-hty
+# set -a; source ~/.robonix/secrets.env; set +a
+robots:
+  - name: robonix.robot.hantewin.benben
+    repo: https://github.com/syswonder/robot-hantewin-benben
+
 
 catalog:
   name: robonix.robot.hty_robot
@@ -37,7 +42,7 @@ env:
   MAPPING_WEBUI_HOST: "0.0.0.0"
   ROBONIX_NAV2_FORCE: native
   ROBONIX_NAV2_PLATFORM: jetson_thor
-  SCENE_MAP_ID: 27f
+  SCENE_MAP_ID: f27_v3
   SCENE_RESTORE_ON_START: "true"
   MAPPING_MAPS_DIR: ${HOME}/.robonix/maps
   # load_map verify: rtabmap regenerates the grid slightly differently on DB
@@ -55,30 +60,31 @@ env:
 
 system:
   atlas:
-    listen: 127.0.0.1:50051
+    listen: 0.0.0.0:50051
     log: info
   executor:
-    listen: 127.0.0.1:50061
+    listen: 0.0.0.0:50061
     log: info
   pilot:
-    listen: 127.0.0.1:50071
+    listen: 0.0.0.0:50071
     log: info
     vlm:
-      upstream: api.openai.com
-      api_key: youkey
-      model: gpt-5
+      upstream: ${VLM_BASE_URL}
+      api_key: ${VLM_API_KEY}
+      model: ${VLM_MODEL}
       api_format: openai
   soma:
     robot_yaml: ./soma.yaml
-    listen: 127.0.0.1:50091
+    listen: 0.0.0.0:50091
     log: info
   liaison:
     listen: 0.0.0.0:50081
     log: info
-  scene:
-    log: info
-    camera_provider_id: realsense_camera
-    web_port: 50107 
+  # scene:
+  #   log: info
+  #   manifest: package_manifest.jetson-native.yaml
+  #   camera_provider_id: realsense_camera
+  #   web_port: 50107 
 primitive: 
   - name: mid360_lidar
     path: ./primitives/primitive-livox-mid360-lidar-rbnx
@@ -97,13 +103,28 @@ primitive:
         # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
         # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
         yaw: 0
+  - name: audio_client_bridge
+    url: https://github.com/syswonder/primitive-audio-client-bridge-rbnx
+    branch: main
+    config:
+      transport: reverse
+      listen_host: 0.0.0.0
+      listen_port: 60002
+  - name: audio_driver
+    url: https://github.com/syswonder/primitive-audio-driver-rbnx
+    branch: main
+    config:
+      mic_device: plughw:CARD=Plus,DEV=0
+      mic_sample_rate: 16000
+      speaker_device: plughw:CARD=Plus,DEV=0
+      speaker_sample_rate: 16000
 
   - name: lakibeam1_lidar
     path: /home/hty/robot-hantewin-benben/primitives/lakiBeam1-lidar
     config:
       # lidar_ip: 192.168.1.133
       # host_ip: 192.168.1.50     
-      ros1_publisher_uri: http://192.168.10.1:40487/
+      # ros1_publisher_uri: http://192.168.10.1:40623/
       scan_hz: 20.0 
       scan_topic: /scan
       frame_id: laser
@@ -145,18 +166,58 @@ primitive:
   - name: benben_chassis
     path: ./primitives/chassis
     config:
-      token: auth_token
+      token: "gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY="
       odom_frame: odom
       base_frame: base_link
       odom_topic: /odom
       odom_hz: 30
-      ros1_odom_publisher_uri: http://192.168.10.1:45173/
-service:
+      # ros1_odom_publisher_uri: http://192.168.10.1:36119/
+
+  # - name: right_arm
+  #   path: ../agilex_nero/agilex_nero/primitives/nero_arm
+  #   config:
+  #     can_channel: can_right
+  #     can_interface: socketcan
+  #     firmware_version: v120
+  #     speed_percent: 50
+  #     enable_on_init: true
+  #     startup_joint_pose: [-0.05, 1.47, -0.04, 0.06, -0.00, -0.20, 0.04]
+  #     effector: agx_gripper
+  #     joint_name_prefix: right_
+  #     reference_frame: right_base_link
+  #     joint_states_topic: /right_arm/joint_states
+  #     joint_command_topic: /right_arm/joint_command
+  #     pos_command_topic: /right_arm/pos_command
+  #     end_pose_topic: /right_arm/end_pose
+  #     gripper_command_topic: /right_arm/gripper_command
+  #     tf_joint_states_topic: /joint_states
+
+  # - name: left_arm
+  #   path: ../agilex_nero/agilex_nero/primitives/nero_arm
+  #   config:
+  #     can_channel: can_piper
+  #     can_interface: socketcan
+  #     firmware_version: v120
+  #     speed_percent: 50
+  #     enable_on_init: true
+  #     startup_joint_pose: [0.07705628647554966, 1.5480895932264502, 0.02642428487519415, 0.009354964790689606, -0.08126252997285598, -0.2852217063609133, -0.06284930636431581]
+  #     effector: agx_gripper
+  #     joint_name_prefix: left_
+  #     reference_frame: left_base_link
+  #     joint_states_topic: /left_arm/joint_states
+  #     joint_command_topic: /left_arm/joint_command
+  #     pos_command_topic: /left_arm/pos_command
+  #     linear_pos_command_topic: /left_arm/linear_pos_command
+  #     end_pose_topic: /left_arm/end_pose
+  #     gripper_command_topic: /left_arm/gripper_command
+  #     tf_joint_states_topic: /joint_states
+
+service: 
   - name: mapping
-    path: /home/hty/robonix/services/service-map-rbnx
+    path: ./services/service-map-rbnx
     manifest: package_manifest.jetson-native.yaml
     config:
-      map_id: 27f
+      map_id: f27_v3
       sensor_providers:
         lidar3d: mid360_lidar
         lidar2d: lakibeam1_lidar
@@ -165,21 +226,44 @@ service:
         # rgb: realsense_camera
         # depth: realsense_camera
       algo: rtabmap
-      map_mode: localization # localization
+      map_mode: mapping # localization
       deskew_lidar: true
       params_file: config/rtabmap_params.yaml
-      lidar_frame: livox_frame
-      # lidar_base_extrinsic:
-      #   x: 0.0
-      #   y: 0.0
-      #   z: 0.0
-      #   roll: 0.0
-      #   pitch: 0.0
-      #   yaw: 0.0
-      # rtabmap_params:
-      #   Grid/FootprintLength: 0.84
-      #   Grid/FootprintWidth: 0.60
-
+      lidar_frame: laser                     # 改用 2D 雷达（lakibeam1）进行定位
+      lidar_base_extrinsic:
+        x: 0.0
+        y: 0.0
+        z: 0.0                               # 2D 雷达在底部，z=0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+      rtabmap_params:
+        Grid/FootprintLength: 0.84
+        Grid/FootprintWidth: 0.60
+  # - name: mapping
+  #   url: https://github.com/syswonder/service-map-rbnx
+  #   branch: main
+  #   manifest: package_manifest.jetson-native.yaml
+  #   config:
+  #     webui_port: 8091
+  #     webui_host: 0.0.0.0
+  #     # Production localization uses chassis odometry. The timestamped Mid360
+  #     # cloud is deskewed against odom before RTAB-Map consumes it.
+  #     # Use RGB for visual constraints and fuse depth with Mid360 occupancy.
+  #     # Camera data stays inside RTAB-Map; Nav2 LaserScan remains lidar-only.
+  #     # Use the chassis odom until a separately declared Mid360 LIO provider
+  #     # passes the static-drift gate. RTAB-Map still fuses RGB-D and Mid360.
+  #     deskew_lidar: true
+  #     # Fuse the front Gemini depth projection with Mid360 in the 2D occupancy
+  #     # grid. Nav2's LaserScan input remains lidar-only.
+  #     # occupancy_sources: [lidar, depth]
+  #     params_file: config/rtabmap_params.yaml
+  #     sensor_providers:
+  #       # lidar3d: mid360_lidar
+  #       lidar2d: lakibeam1_lidar
+  #       odom: benben_chassis
+  #       # rgb: realsense_camera
+  #       # depth: realsense_camera
 
   - name: nav2
     path: ./rbnx-boot/cache/service-navigation-rbnx
@@ -199,7 +283,119 @@ service:
         # Canonical odom owner. Replace with a declared Mid360 LIO provider
         # only after that provider exists and passes the static-drift gate.
         odom: benben_chassis
-        scan_cloud: mid360_lidar
-          
+        scan_cloud: lakibeam1_lidar # lakibeam1_lidar mid360_lidar
+  - name: speech
+    path: ${ROBONIX_SOURCE_PATH}/services/speech
+    config:
+      speech_backend: tencent
+      default_speaker_provider_id: audio_driver
+      tencent_asr_appid: ${TENCENT_ASR_APPID}
+      tencent_tts_voice_type: 502003     
 
 skill: []
+  # - name: p2pmov
+  #   path: ./skills/p2pmov
+  #   config:
+  #     token: "gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY="
+  #     map_name: "bdyjy_27_0805.bin"   # 车上实际地图名
+  #     points:
+  #       饮水机: {x: 20.22, y: 2.10,yaw: -1.52}
+  #       原点: {x: 0.0, y: 0.0, yaw: 0.0}
+  #       工位: {x: 2.29, y: 1.01, yaw: 2.89}
+
+  # - name: nero_grasp
+  #   path: ../agilex_nero/agilex_nero/skills/nero_grasp
+  #   config:
+  #     execution_mode: single
+  #     arms:
+  #       - left_arm
+  #     # User-set initial/observe joint pose (7 rad); arm returns here after grasp.
+  #     relay:
+  #       joint_poses:
+  #         - [-0.3694862026471996, 0.5615596868291755, 0.0937241808320955, 1.2864123784749406, 0.015236724369910496, 0.031869712141416456, 0.02192133540504878]
+  #         - [-1.183821925042714, 0.09622000166244739, -0.056775560567375545, 1.9466180746268356, 0.07347836150896127, -0.09749409201640326, 0.05981243346584567]
+  #         - [-1.1256326477812229, 0.2766172331485813, -0.49141490419152345, 2.0689132953140783, 1.5834848704568953, -0.09754645189396309, 0.3352253894305509]
+  #     initial_joint_pose: [-0.39652135276059175, 0.9828821682606066, -1.6339772457170914, 2.0980602938223836, 2.175779805413691, 0.10484192816729938, 0.7329335660824987]
+  #     camera_provider_id: realsense_camera
+  #     calib_path: ./calib/camera_to_robot.json
+  #     require_detection: true
+  #     camera_frame_timeout_s: 5.0
+  #     # target_source: vlm | fixed_tcp
+  #     target_source: vlm
+  #     # fixed_tcp example (no camera/VLM; rpy optional — omit to keep pose at initial):
+  #     # target_source: fixed_tcp
+  #     # fixed_tcp_pose: [-0.042, 0.544, 0.168, -0.025, 0.427, 1.399]
+  #     # User-set initial/observe joint pose (7 rad); arm returns here after grasp.
+  #     detector_settings:
+  #       detector: vlm
+  #       instruction: "抓取桌上的清洁剂"
+  #       debug_dir: ../agilex_nero/agilex_nero/calib/vlm_detect_preview
+  #       depth_min_m: 0.15
+  #       depth_max_m: 1.8
+  #       sample_window: 15
+  #     # Robot-base XYZ tweak applied on top of detected cup position (m).
+  #     offset:
+  #     xyz: [0.00, 0.02, -0.035] #up,foward,left
+  #     step_pause_s: 0.0
+  #     gripper_open_width_m: 0.10
+  #     gripper_close_width_m: 0.0
+  #     gripper_force_n: 1.0
+  #     lift_offset_m: 0.03
+  #     motion_timeout_s: 20.0
+  #     return_initial: false
+  #     recover_on_failure: false
+  #     # Post-grasp holding pose (7 rad); direct move_j after close/lift.
+  #     standby_joint_pose: [-0.8762425509637531, 1.3580057843917481, -1.1004475466749448, 1.8231360300482367, 2.645273374200166, -0.2004336112990288, 0.8521570072862314]
+  # - name: nero_return_home
+  #   path: ../agilex_nero/agilex_nero/skills/nero_return_home
+  #   config:
+  #     execution_mode: single
+  #     arms:
+  #       - left_arm
+  #     # start_from: relay (already on path) | standby (post-grasp) | current (home only)
+  #     start_from: standby
+  #     standby_joint_pose: [-0.8762425509637531, 1.3580057843917481, -1.1004475466749448, 1.8231360300482367, 2.645273374200166, -0.2004336112990288, 0.8521570072862314]
+  #     # Optional transition from standby onto relay path (add if relay[0] is far from standby).
+  #     standby_exit:
+  #       joint_poses:
+  #         - [-0.39652135276059175, 0.9828821682606066, -1.6339772457170914, 2.0980602938223836, 2.175779805413691, 0.10484192816729938, 0.7329335660824987]
+  #     relay:
+  #       joint_poses:
+  #         - [-1.1256326477812229, 0.2766172331485813, -0.49141490419152345, 2.0689132953140783, 1.5834848704568953, -0.09754645189396309, 0.3352253894305509]
+  #         - [-1.183821925042714, 0.09622000166244739, -0.056775560567375545, 1.9466180746268356, 0.07347836150896127, -0.09749409201640326, 0.05981243346584567]
+  #         - [-0.3694862026471996, 0.5615596868291755, 0.0937241808320955, 1.2864123784749406, 0.015236724369910496, 0.031869712141416456, 0.02192133540504878]
+  #     home:
+  #       joint_pose: [0.07705628647554966, 1.5480895932264502, 0.02642428487519415, 0.009354964790689606, -0.08126252997285598, -0.2852217063609133, -0.06284930636431581]
+  #     gripper:
+  #       open_width_m: 0.10
+  #       close_width_m: 0.0
+  #       force_n: 1.0
+  #       close_before_return: false
+  #       open_wait_s: 1.0
+  #     motion_timeout_s: 20.0
+  #     step_pause_s: 0.0
+  # - name: nero_wave
+  #   path: ../agilex_nero/agilex_nero/skills/nero_wave
+  #   config:
+  #     execution_mode: single
+  #     arms:
+  #       - left_arm
+  #     start_at_home: true
+  #     home:
+  #       joint_pose: [0.07705628647554966, 1.5480895932264502, 0.02642428487519415, 0.009354964790689606, -0.08126252997285598, -0.2852217063609133, -0.06284930636431581]
+  #     motion_timeout_s: 20.0
+  #     step_pause_s: 0.0
+  #     default_tcp_linear: false
+  #     steps:
+  #       - name: wave_left
+  #         joint_pose: [-0.2554114827368502, 0.5304928261436764, -2.806768689887201, 2.2009474532274496, -0.12934635086529978, 0.0025830872929516074, 0.14170328196941961]
+  #       - name: wave_right
+  #         joint_pose: [-0.2554114827368502, 0.5304928261436764, -2.806768689887201, 1.3596114873035827, -0.13013174902869723, 0.0025830872929516074, 0.10840239984136782]
+  #       - name: wave_left
+  #         joint_pose: [-0.2554114827368502, 0.5304928261436764, -2.806768689887201, 2.2009474532274496, -0.12934635086529978, 0.0025830872929516074, 0.14170328196941961]
+  #       - name: wave_right
+  #         joint_pose: [-0.2554114827368502, 0.5304928261436764, -2.806768689887201, 1.3596114873035827, -0.13013174902869723, 0.0025830872929516074, 0.10840239984136782]
+  #       - name: return_arm_0
+  #         joint_pose: [-0.05, 1.47, -0.04, 0.06, -0.00, -0.20, 0.04]
+        
+

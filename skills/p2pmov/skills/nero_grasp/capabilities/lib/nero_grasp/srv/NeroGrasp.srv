@@ -1,0 +1,6 @@
+# 检测并抓取桌面上的指定物体。这个skill并不负责放松开物体
+# object_name 为空时使用 manifest 中 detector_settings.instruction。
+string object_name
+---
+bool success
+std_msgs/String message

@@ -1,0 +1,14 @@
+# robonix/skill/p2pmov/move/status — poll progress of the active TBox
+# navigation task. Pilot / executor call this between rounds to decide
+# whether to wait or proceed.
+[contract]
+id      = "robonix/skill/p2pmov/move/status"
+version = "1"
+kind    = "skill"
+idl     = "p2pmov/srv/P2PStatus.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true

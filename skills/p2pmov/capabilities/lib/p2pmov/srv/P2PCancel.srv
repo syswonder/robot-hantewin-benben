@@ -1,0 +1,7 @@
+# robonix/skill/p2pmov/move/cancel — abort the active navigation task.
+# Sends TBox task_control(CANCEL). Idempotent: cancelling with no active
+# task is ok=true with a no-op message.
+string run_id
+---
+bool ok
+string message

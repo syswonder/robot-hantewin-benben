@@ -26,8 +26,28 @@ RGBD/NeighborLinkRefining: true
 RGBD/ProximityBySpace: true
 RGBD/AngularUpdate: 0.1
 RGBD/LinearUpdate: 0.1
-Vis/MinInliers: 12
+Vis/MinInliers: 15                          # 适中的内点数要求（2D雷达点云密度较低）
 Rtabmap/DetectionRate: 1.0
-Icp/MaxCorrespondenceDistance: 0.2
-Icp/MaxTranslation: 0.5
-Icp/MaxRotation: 0.78
+
+# ICP 配置：严格但合理的匹配要求（2D雷达）
+Icp/MaxCorrespondenceDistance: 0.15         # 匹配距离 15cm（2D 雷达适中值）
+Icp/MaxTranslation: 0.3                     # 最大平移 30cm
+Icp/MaxRotation: 0.52                       # 最大旋转 30°
+Icp/CorrespondenceRatio: 0.4                # 至少 40% 的点能匹配（2D 降低要求）
+
+# 重定位验证：拒绝低质量匹配
+Rtabmap/LoopThr: 0.15                       # 回环检测阈值（越高越严格，默认 0.11）
+Mem/RehearsalSimilarity: 0.6                # 相似度阈值（越高越严格，默认 0.6）
+RGBD/OptimizeFromGraphEnd: false            # localization 模式下不从图末端优化
+
+# 初始位置设置验证（关键！）
+Mem/IncrementalMemory: false                # localization 模式：不增量建图，只定位
+Mem/STMSize: 1                              # 短期记忆大小设为 1（localization 模式）
+Rtabmap/StartNewMapOnLoopClosure: false     # 不在回环时创建新地图
+
+# 启用持续定位修正（关键！防止漂移）
+RGBD/ProximityPathMaxNeighbors: 10          # 邻近路径最大邻居数
+RGBD/LocalRadius: 10                        # 本地半径 10m 内搜索匹配
+RGBD/ProximityAngle: 45                     # 邻近角度 45°
+RGBD/ProximityByTime: false                 # 不按时间，按空间邻近
+Rtabmap/TimeThr: 0                          # 时间阈值设为 0，始终尝试闭环

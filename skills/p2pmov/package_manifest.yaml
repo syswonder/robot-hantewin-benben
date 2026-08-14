@@ -1,0 +1,36 @@
+# p2pmov — point-to-point navigation skill for the Hantewin BenBen chassis.
+#
+# kind: skill (user-invocable atomic intent). LLM/pilot calls
+# robonix/skill/p2pmov/move with either a named point (from the deployment
+# `points` config dict) or raw (x, y, yaw) coordinates. The goal is
+# dispatched through the vendor TBox SDK task_distribution(), so the
+# chassis navigates autonomously on its onboard map. move/status and
+# move/cancel are sibling MCP tools for the executor's task lifecycle.
+#
+# No atlas dependencies — this skill talks to the chassis directly via the
+# TBox SDK (same closed-source vendor stack as the benben_chassis
+# primitive), not through robonix/primitive/chassis/*.
+manifestVersion: 1
+
+package:
+  name: robonix.skill.p2pmov
+  version: 0.1.0
+  description: Point-to-point navigation via TBox SDK task_distribution — named points or raw (x, y, yaw) goals.
+  tags: [skill, navigation, p2p, tbox, benben]
+  maintainers: [wheatfox <wheatfox17@icloud.com>]
+  license: MulanPSL-2.0
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+# Fixed capability surface — everything we declare on atlas at startup is
+# listed here. New caps == bump version + update atlas_bridge.
+capabilities:
+  - name: robonix/skill/p2pmov/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/p2pmov/move
+    path: capabilities/move.v1.toml
+  - name: robonix/skill/p2pmov/move/status
+    path: capabilities/status.v1.toml
+  - name: robonix/skill/p2pmov/move/cancel
+    path: capabilities/cancel.v1.toml

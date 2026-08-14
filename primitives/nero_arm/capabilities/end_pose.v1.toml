@@ -1,0 +1,10 @@
+# Continuous TCP/end-effector pose feedback in the provider reference frame.
+[contract]
+id      = "robonix/primitive/arm/end_pose"
+version = "1"
+kind    = "primitive"
+idl     = "common_interfaces/geometry_msgs/msg/Pose.msg"
+description = "Continuous end-effector pose stream for an arm primitive."
+
+[mode]
+type = "topic_out"

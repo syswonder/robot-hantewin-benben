@@ -1,0 +1,10 @@
+# Continuous joint feedback for one manipulator instance.
+[contract]
+id      = "robonix/primitive/arm/joint_states"
+version = "1"
+kind    = "primitive"
+idl     = "common_interfaces/sensor_msgs/msg/JointState.msg"
+description = "Continuous arm joint state stream."
+
+[mode]
+type = "topic_out"

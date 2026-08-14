@@ -139,11 +139,18 @@ behavior_server:
     local_footprint_topic: local_costmap/published_footprint
     global_footprint_topic: global_costmap/published_footprint
     cycle_frequency: 10.0
-    # Packaged v0.1 tree (navigate.xml) only calls Wait; no physical
-    # recovery spin, matching the bt_navigator comment above.
-    behavior_plugins: ["wait"]
+    # navigate.xml only calls Wait, but bt_navigator pre-loads the stock
+    # navigate_through_poses recovery tree at activate, which needs the
+    # /spin and /backup action servers — without them bringup aborts
+    # ("Action server spin not available"). Provide them; navigate.xml
+    # still never triggers a physical recovery.
+    behavior_plugins: ["wait", "spin", "backup"]
     wait:
       plugin: "nav2_behaviors::Wait"
+    spin:
+      plugin: "nav2_behaviors::Spin"
+    backup:
+      plugin: "nav2_behaviors::BackUp"
     local_frame: odom
     global_frame: map
     robot_base_frame: base_link
@@ -179,9 +186,9 @@ collision_monitor:
     cmd_vel_in_topic: "cmd_vel_smoothed"
     cmd_vel_out_topic: "cmd_vel"
     state_topic: "collision_monitor_state"
-    transform_tolerance: 0.2
+    transform_tolerance: 0.3
     source_timeout: 1.0
-    base_shift_correction: True
+    base_shift_correction: False
     stop_pub_timeout: 2.0
     polygons: ["FootprintApproach"]
     FootprintApproach:

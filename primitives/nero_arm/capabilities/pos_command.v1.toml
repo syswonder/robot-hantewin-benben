@@ -1,0 +1,10 @@
+# Cartesian end-effector command input; IK is performed by the provider.
+[contract]
+id      = "robonix/primitive/arm/pos_command"
+version = "1"
+kind    = "primitive"
+idl     = "common_interfaces/geometry_msgs/msg/Pose.msg"
+description = "Cartesian end-effector target stream for an arm primitive."
+
+[mode]
+type = "topic_in"

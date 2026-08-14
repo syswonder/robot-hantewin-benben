@@ -1,0 +1,8 @@
+[contract]
+id      = "robonix/skill/nero_wave/wave"
+version = "1"
+kind    = "skill"
+idl     = "nero_wave/srv/NeroWave.srv"
+
+[mode]
+type = "rpc"

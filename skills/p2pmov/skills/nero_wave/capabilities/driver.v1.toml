@@ -1,0 +1,10 @@
+# Lifecycle interface required for rbnx boot to call Driver(CMD_INIT).
+[contract]
+id      = "robonix/skill/nero_wave/driver"
+version = "1"
+kind    = "skill"
+idl     = "lifecycle/srv/Driver.srv"
+description = "Lifecycle control interface for nero_wave skill."
+
+[mode]
+type = "rpc"

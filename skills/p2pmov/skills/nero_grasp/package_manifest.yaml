@@ -1,0 +1,27 @@
+manifestVersion: 1
+
+build: bash scripts/build.sh
+
+start: bash scripts/start.sh
+
+package:
+  name: "robonix.skill.nero_grasp"
+  version: 0.1.0
+  description: Hard-coded dual-arm grasp skill for AgileX Nero manipulators.
+  tags:
+    - skill
+    - robonix
+    - agilex
+    - nero
+    - grasp
+  maintainers:
+    - Yuzheng Gao <2300013159@stu.pku.edu.cn>
+  license: Apache-2.0
+
+capabilities:
+  - name: robonix/skill/nero_grasp/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/nero_grasp/grasp
+    path: capabilities/grasp.v1.toml
+
+depends: []

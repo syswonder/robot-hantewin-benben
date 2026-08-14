@@ -30,6 +30,7 @@ import threading
 import xmlrpc.client
 
 from robonix_api import Primitive, Ok, Err
+from urllib.parse import urlparse
 
 logging.basicConfig(
     level=os.environ.get("LAKIBEAM1_LOG_LEVEL", "INFO"),
@@ -320,7 +321,14 @@ def _publish_scan() -> None:
         # The ROS1 node's clock may differ from the host, causing TF
         # extrapolation errors in consumers (rtabmap, nav2).
         if _clock is not None:
-            stamp = _clock.now().to_msg()
+            from rclpy.duration import Duration
+            # Back-date by one scan period: the scan was measured over the
+            # previous `scan_time`, and stamping at "now" makes nav2 look up
+            # odom->base_link at a timestamp slightly beyond the latest odom
+            # TF, which tf2 refuses ("extrapolation into the future" — tf2
+            # does not interpolate past the newest sample).
+            stamp = (_clock.now() - Duration(
+                seconds=max(float(scan["scan_time"]), 0.05))).to_msg()
             msg.header.stamp = stamp
         else:
             msg.header.stamp.sec = scan["sec"]
@@ -383,6 +391,69 @@ def snapshot(msg: Empty) -> LaserScanMcp:
     return _ros_to_mcp(scan)
 
 
+def get_topic_publisher_port(topic, master_uri=None, publisher_name=None):
+    """获取指定话题的发布者端口号并返回。
+
+    通过 ROS Master 查询:
+    1. getSystemState 找到该话题的发布者节点列表
+    2. lookupNode 查询发布者节点的 XML-RPC URI
+    3. 解析出端口号返回
+
+    Args:
+        topic: 话题名,如 "/odom"
+        master_uri: ROS Master 的 XML-RPC 地址,默认取 ROS_MASTER_URI 环境变量,
+            缺省为 http://192.168.10.1:11311
+        publisher_name: 指定要查的发布者节点名(如 "/motor");留空则取第一个
+
+    Returns:
+        int | None: 发布者端口号;话题无发布者、节点不可达或解析失败时返回 None
+    """
+    if master_uri is None:
+        master_uri = os.environ.get('ROS_MASTER_URI', 'http://192.168.10.1:11311')
+
+    proxy = xmlrpc.client.ServerProxy(master_uri + '/RPC2')
+    caller_id = '/python_xmlrpc_client'
+
+    # 1. 获取系统状态
+    code, msg, state = proxy.getSystemState(caller_id)
+    if code != 1:
+        print(f"错误: {msg}")
+        return None
+
+    pub_list, _sub_list, _srv_list = state
+
+    # 2. 找到该话题的发布者节点列表
+    pubs = []
+    for topic_name, pub_nodes in pub_list:
+        if topic_name == topic:
+            pubs = pub_nodes
+            break
+    if not pubs:
+        print(f"话题 {topic} 没有发布者")
+        return None
+
+    # 3. 选择发布者节点
+    if publisher_name is not None:
+        if publisher_name not in pubs:
+            print(f"节点 {publisher_name} 不是话题 {topic} 的发布者,可选: {', '.join(pubs)}")
+            return None
+        node_name = publisher_name
+    else:
+        node_name = pubs[0]
+
+    # 4. 查询节点 XML-RPC URI 并解析端口号
+    code, msg, node_uri = proxy.lookupNode(caller_id, node_name)
+    if code != 1:
+        print(f"查询节点 {node_name} 失败: {msg}")
+        return None
+
+    try:
+        # node_uri 形如 http://192.168.1.100:34567/
+        return urlparse(node_uri).port
+    except Exception as e:
+        print(f"解析 {node_name} 的 URI {node_uri} 失败: {e}")
+        return None
+
 # ── lifecycle ────────────────────────────────────────────────────────────────
 @lakibeam1_lidar.on_init
 def init(cfg):
@@ -397,16 +468,21 @@ def init(cfg):
         cfg.get("scan_hz")
         or os.environ.get("LAKIBEAM1_SCAN_HZ", "10")
     )
-    ros1_publisher_uri = (
-        cfg.get("ros1_publisher_uri")
-        or os.environ.get("LAKIBEAM1_ROS1_PUBLISHER_URI")
-        or "http://192.168.10.1:39233/"
-    )
+    target_ip = cfg.get("ros1_target_ip") or os.environ.get("LAKIBEAM1_ROS1_TARGET_IP") or "192.168.10.1"
+    # ros1_publisher_uri = (
+    #     cfg.get("ros1_publisher_uri")
+    #     or os.environ.get("LAKIBEAM1_ROS1_PUBLISHER_URI")
+    #     or "http://192.168.10.1:39233/"
+    # )
     ros1_topic = (
         cfg.get("ros1_topic")
         or os.environ.get("LAKIBEAM1_ROS1_TOPIC")
         or "/scan_filter"
     )
+    port = get_topic_publisher_port(ros1_topic)
+    if port is None:
+        return Err(f"Failed to get publisher port for topic {ros1_topic}")
+    ros1_publisher_uri = f'http://{target_ip}:{port}/'
     _frame_id = str(
         cfg.get("frame_id")
         or os.environ.get("LAKIBEAM1_FRAME_ID", "laser")

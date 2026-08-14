@@ -1,0 +1,29 @@
+manifestVersion: 1
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+stop: bash scripts/stop.sh
+
+package:
+  name: robonix.primitive.agilex.nero.arm
+  version: 0.1.0
+  description: AgileX Nero 7-DOF arm driver via pyAgxArm for Robonix.
+  tags:
+    - primitive
+    - arm
+    - agilex
+    - nero
+  maintainers:
+    - Yuzheng Gao <2300013159@stu.pku.edu.cn>
+  license: Apache-2.0
+
+capabilities:
+  - name: robonix/primitive/arm/driver
+  - name: robonix/primitive/arm/joint_states
+  - name: robonix/primitive/arm/joint_command
+  - name: robonix/primitive/arm/pos_command
+  - name: robonix/primitive/arm/linear_pos_command
+  - name: robonix/primitive/arm/end_pose
+  - name: robonix/primitive/arm/gripper_command
+
+depends: []

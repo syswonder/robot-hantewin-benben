@@ -1,0 +1,10 @@
+# Gripper width/force command input for an arm with an initialized effector.
+[contract]
+id      = "robonix/primitive/arm/gripper_command"
+version = "1"
+kind    = "primitive"
+idl     = "common_interfaces/std_msgs/msg/Float64MultiArray.msg"
+description = "Gripper command stream: data[0]=width (m), data[1]=force (N, optional)."
+
+[mode]
+type = "topic_in"

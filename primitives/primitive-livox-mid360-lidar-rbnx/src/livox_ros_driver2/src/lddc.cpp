@@ -306,14 +306,15 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
   cloud.is_bigendian = false;
   cloud.is_dense     = true;
 
-  if (!pkg.points.empty()) {
-    timestamp = pkg.base_time;
-  }
-
+  // Use ROS system time instead of unreliable lidar hardware timestamp
+  // to prevent TF extrapolation errors when hardware clock jumps.
   #ifdef BUILDING_ROS1
-      cloud.header.stamp = ros::Time( timestamp / 1000000000.0);
+      cloud.header.stamp = ros::Time::now();
+      timestamp = cloud.header.stamp.toNSec();
   #elif defined BUILDING_ROS2
-      cloud.header.stamp = rclcpp::Time(timestamp);
+      auto now = cur_node_->now();
+      cloud.header.stamp = now;
+      timestamp = now.nanoseconds();
   #endif
 
   std::vector<LivoxPointXyzrtlt> points;
@@ -360,17 +361,17 @@ void Lddc::InitCustomMsg(CustomMsg& livox_msg, const StoragePacket& pkg, uint8_t
   ++msg_seq;
 #endif
 
-  uint64_t timestamp = 0;
-  if (!pkg.points.empty()) {
-    timestamp = pkg.base_time;
-  }
-  livox_msg.timebase = timestamp;
+  // Use ROS system time instead of unreliable lidar hardware timestamp
+  #ifdef BUILDING_ROS1
+    livox_msg.header.stamp = ros::Time::now();
+    uint64_t timestamp = livox_msg.header.stamp.toNSec();
+  #elif defined BUILDING_ROS2
+    auto now = cur_node_->now();
+    livox_msg.header.stamp = now;
+    uint64_t timestamp = now.nanoseconds();
+  #endif
 
-#ifdef BUILDING_ROS1
-  livox_msg.header.stamp = ros::Time(timestamp / 1000000000.0);
-#elif defined BUILDING_ROS2
-  livox_msg.header.stamp = rclcpp::Time(timestamp);
-#endif
+  livox_msg.timebase = timestamp;
 
   livox_msg.point_num = pkg.points_num;
   if (lds_->lidars_[index].lidar_type == kLivoxLidarType) {
@@ -422,13 +423,13 @@ void Lddc::InitPclMsg(const StoragePacket& pkg, PointCloud& cloud, uint64_t& tim
   cloud.height = 1;
   cloud.width = pkg.points_num;
 
-  if (!pkg.points.empty()) {
-    timestamp = pkg.base_time;
-  }
+  // Use ROS system time instead of unreliable lidar hardware timestamp
+  ros::Time now = ros::Time::now();
+  timestamp = now.toNSec();
   cloud.header.stamp = timestamp / 1000.0;  // to pcl ros time stamp
 #elif defined BUILDING_ROS2
   std::cout << "warning: pcl::PointCloud is not supported in ROS2, "
-            << "please check code logic" 
+            << "please check code logic"
             << std::endl;
 #endif
   return;
@@ -480,11 +481,14 @@ void Lddc::PublishPclData(const uint8_t index, const uint64_t timestamp, const P
 void Lddc::InitImuMsg(const ImuData& imu_data, ImuMsg& imu_msg, uint64_t& timestamp) {
   imu_msg.header.frame_id = "livox_frame";
 
-  timestamp = imu_data.time_stamp;
+  // Use ROS system time instead of unreliable lidar hardware timestamp
 #ifdef BUILDING_ROS1
-  imu_msg.header.stamp = ros::Time(timestamp / 1000000000.0);  // to ros time stamp
+  imu_msg.header.stamp = ros::Time::now();
+  timestamp = imu_msg.header.stamp.toNSec();
 #elif defined BUILDING_ROS2
-  imu_msg.header.stamp = rclcpp::Time(timestamp);  // to ros time stamp
+  auto now = cur_node_->now();
+  imu_msg.header.stamp = now;
+  timestamp = now.nanoseconds();
 #endif
 
   imu_msg.angular_velocity.x = imu_data.gyro_x;

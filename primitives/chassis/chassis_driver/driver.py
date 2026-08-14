@@ -30,7 +30,7 @@ import struct
 import threading
 import time
 import xmlrpc.client
-
+from urllib.parse import urlparse
 from robonix_api import Primitive, Ok, Err, Deferred
 from tbox_sdk import TBoxClient, TBoxSDKError
 
@@ -333,14 +333,20 @@ def _on_twist_in(msg) -> None:
     progress the Twist is silently dropped rather than queueing up behind
     the motion lock.
     """
-    linear_x = float(getattr(msg, "linear_x", 0.0))
-    linear_y = float(getattr(msg, "linear_y", 0.0))
-    linear_z = float(getattr(msg, "linear_z", 0.0))
-    angular_x = float(getattr(msg, "angular_x", 0.0))
-    angular_y = float(getattr(msg, "angular_y", 0.0))
-    angular_z = float(getattr(msg, "angular_z", 0.0))
-    data = [linear_x, linear_y, linear_z, angular_x, angular_y, angular_z, 0.0, 0,0, 0.0, 0]
-    send_cmd(_udp_server_port, _udp_server_ip, _udp_server_port, data)
+    linear_x = float(msg.linear.x)
+    linear_y = float(msg.linear.y)
+    linear_z = float(msg.linear.z)
+    angular_x = float(msg.angular.x)
+    angular_y = float(msg.angular.y)
+    angular_z = float(msg.angular.z)
+    # 10-element TBox command: [vx,vy,vz, wx,wy,wz, duration_s, fwd_m, rot_deg, type].
+    # type=1 = twist mode (continuous velocity), matching a live /cmd_vel stream.
+    # Send via the shared UDP socket _udp_clinet. Passing the int port here
+    # (as the old code did) raised a TypeError/ValueError in send_cmd, the rclpy
+    # spin loop exited, and the odom timer died with it — i.e. starting a nav2
+    # navigation would kill /odom and break every downstream TF lookup.
+    data = [linear_x, linear_y, linear_z, angular_x, angular_y, angular_z, 0.0, 0.0, 0.0, 1]
+    send_cmd(_udp_clinet, _udp_server_ip, _udp_server_port, data)
 
 
 # ── gRPC RPC: `move` (no MCP - keep velocity primitive off the LLM tool list) ─
@@ -444,6 +450,69 @@ def move(req: "chassis_pb2.ExecuteMoveCommand_Request") -> "chassis_pb2.ExecuteM
     )
 
 
+def get_topic_publisher_port(topic, master_uri=None, publisher_name=None):
+    """获取指定话题的发布者端口号并返回。
+
+    通过 ROS Master 查询:
+    1. getSystemState 找到该话题的发布者节点列表
+    2. lookupNode 查询发布者节点的 XML-RPC URI
+    3. 解析出端口号返回
+
+    Args:
+        topic: 话题名,如 "/odom"
+        master_uri: ROS Master 的 XML-RPC 地址,默认取 ROS_MASTER_URI 环境变量,
+            缺省为 http://192.168.10.1:11311
+        publisher_name: 指定要查的发布者节点名(如 "/motor");留空则取第一个
+
+    Returns:
+        int | None: 发布者端口号;话题无发布者、节点不可达或解析失败时返回 None
+    """
+    if master_uri is None:
+        master_uri = os.environ.get('ROS_MASTER_URI', 'http://192.168.10.1:11311')
+
+    proxy = xmlrpc.client.ServerProxy(master_uri + '/RPC2')
+    caller_id = '/python_xmlrpc_client'
+
+    # 1. 获取系统状态
+    code, msg, state = proxy.getSystemState(caller_id)
+    if code != 1:
+        print(f"错误: {msg}")
+        return None
+
+    pub_list, _sub_list, _srv_list = state
+
+    # 2. 找到该话题的发布者节点列表
+    pubs = []
+    for topic_name, pub_nodes in pub_list:
+        if topic_name == topic:
+            pubs = pub_nodes
+            break
+    if not pubs:
+        print(f"话题 {topic} 没有发布者")
+        return None
+
+    # 3. 选择发布者节点
+    if publisher_name is not None:
+        if publisher_name not in pubs:
+            print(f"节点 {publisher_name} 不是话题 {topic} 的发布者,可选: {', '.join(pubs)}")
+            return None
+        node_name = publisher_name
+    else:
+        node_name = pubs[0]
+
+    # 4. 查询节点 XML-RPC URI 并解析端口号
+    code, msg, node_uri = proxy.lookupNode(caller_id, node_name)
+    if code != 1:
+        print(f"查询节点 {node_name} 失败: {msg}")
+        return None
+
+    try:
+        # node_uri 形如 http://192.168.1.100:34567/
+        return urlparse(node_uri).port
+    except Exception as e:
+        print(f"解析 {node_name} 的 URI {node_uri} 失败: {e}")
+        return None
+
 
 # ── lifecycle ────────────────────────────────────────────────────────────────
 @benben_chassis.on_init
@@ -466,16 +535,17 @@ def init(cfg):
     )
     _udp_server_port = int(cfg.get("ros1_target_port") or os.environ.get("BENBEN_ROS1_CMD_VEL_SOCKET_PORT") or "11451")
 
-    ros1_odom_uri = (
-        cfg.get("ros1_odom_publisher_uri")
-        or os.environ.get("BENBEN_ROS1_ODOM_PUBLISHER_URI")
-        or "http://192.168.10.1:32769/"
-    )
+
     ros1_odom_topic = (
         cfg.get("ros1_odom_topic")
         or os.environ.get("BENBEN_ROS1_ODOM_TOPIC")
         or "/odom"
     )
+    odom_port = get_topic_publisher_port(ros1_odom_topic)
+    if odom_port is None:
+        return Err("Failed to get odom topic publisher port")
+    ros1_odom_uri = f'http://{_udp_server_ip}:{odom_port}/'
+
     sentinel_timeout = float(cfg.get("odom_sentinel_timeout_s", 15.0))
     if odom_hz <= 0:
         return Err("odom_hz must be greater than zero")

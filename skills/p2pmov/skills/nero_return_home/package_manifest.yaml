@@ -1,0 +1,26 @@
+manifestVersion: 1
+
+build: bash scripts/build.sh
+
+start: bash scripts/start.sh
+
+package:
+  name: "robonix.skill.nero_return_home"
+  version: 0.1.0
+  description: Release gripper for user to pick up objects and return AgileX Nero arm to home via relay.
+  tags:
+    - skill
+    - robonix
+    - agilex
+    - nero
+  maintainers:
+    - Yuzheng Gao <2300013159@stu.pku.edu.cn>
+  license: Apache-2.0
+
+capabilities:
+  - name: robonix/skill/nero_return_home/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/nero_return_home/return_home
+    path: capabilities/return_home.v1.toml
+
+depends: []

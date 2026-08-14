@@ -1,0 +1,13 @@
+# robonix/skill/p2pmov/move/cancel — abort the active navigation task.
+# Sends TBox task_control(CANCEL). Idempotent.
+[contract]
+id      = "robonix/skill/p2pmov/move/cancel"
+version = "1"
+kind    = "skill"
+idl     = "p2pmov/srv/P2PCancel.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true

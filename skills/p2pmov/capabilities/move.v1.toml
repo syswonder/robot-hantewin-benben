@@ -1,0 +1,16 @@
+# robonix/skill/p2pmov/move — point-to-point navigation.
+# User-invocable atomic intent: "go to <named point>" or "go to (x, y, yaw)".
+# Dispatches a TBox task_distribution goal; the chassis navigates
+# autonomously on its onboard map. Returns immediately with a run_id;
+# callers poll /move/status, cancel via /move/cancel.
+[contract]
+id      = "robonix/skill/p2pmov/move"
+version = "1"
+kind    = "skill"
+idl     = "p2pmov/srv/P2PMove.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true

@@ -1,0 +1,4 @@
+# 执行配置的挥手动作序列。
+---
+bool success
+std_msgs/String message

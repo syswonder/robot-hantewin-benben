@@ -8,16 +8,16 @@ robot:
   display_name: "HTY BenBen mobile robot"
   family: mobile_robot
   root_part: base
-  dimensions: { length_m: 0.84, width_m: 0.60, height_m: 1.0 }
+  dimensions: { length_m: 0.30, width_m: 0.30, height_m: 1.0 }
   footprint:
     base_frame: base_link
     points:
-      - [0.42, 0.30]
-      - [0.42, -0.30]
-      - [-0.42, -0.30]
-      - [-0.42, 0.30]
+      - [0.20, 0.20]
+      - [0.20, -0.20]
+      - [-0.20, -0.20]
+      - [-0.20, 0.20]
   mass_kg: 30.0
-  passable_door_width_m: 0.80
+  passable_door_width_m: 0.50
   exports:
     # mapping service (rtabmap) - SLAM mapping & localization
     - provider_id: mapping

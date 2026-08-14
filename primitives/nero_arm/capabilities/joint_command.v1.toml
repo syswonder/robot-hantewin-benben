@@ -1,0 +1,10 @@
+# Joint-space command input for one manipulator instance.
+[contract]
+id      = "robonix/primitive/arm/joint_command"
+version = "1"
+kind    = "primitive"
+idl     = "common_interfaces/sensor_msgs/msg/JointState.msg"
+description = "Joint-space command stream for an arm primitive."
+
+[mode]
+type = "topic_in"
