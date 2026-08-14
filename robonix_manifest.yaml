@@ -1,13 +1,9 @@
 manifestVersion: 1
 name: robonix-hty
 # set -a; source ~/.robonix/secrets.env; set +a
-robots:
-  - name: robonix.robot.hantewin.benben
-    repo: https://github.com/syswonder/robot-hantewin-benben
-
 
 catalog:
-  name: robonix.robot.hty_robot
+  name: robonix.robot.hantewin.benben
   version: 0.1.0
   description: "TODO: describe this robot deployment."
   tags:
