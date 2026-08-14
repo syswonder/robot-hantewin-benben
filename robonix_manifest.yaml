@@ -5,13 +5,11 @@ name: robonix-hty
 catalog:
   name: robonix.robot.hantewin.benben
   version: 0.1.0
-  description: "TODO: describe this robot deployment."
-  tags:
-    - robot
-    - deploy
-    - robonix
+  description: "Robonix deploy manifest for the Hantewin Benben"
+  tags: [robot, deploy, hantewin, benben, jetson, lidar, rgbd, scene, mapping],
+  license: Apache-2.0
   maintainers:
-    - Your Name <you@example.com>
+    - futaba19-c <futaba19c@foxmail.com>
 
 env:
   LOG: "INFO"
