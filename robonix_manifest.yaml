@@ -114,7 +114,7 @@ primitive:
       speaker_sample_rate: 16000
 
   - name: lakibeam1_lidar
-    path: /home/hty/robot-hantewin-benben/primitives/lakiBeam1-lidar
+    path: ./primitives/lakiBeam1-lidar
     config:
       # lidar_ip: 192.168.1.133
       # host_ip: 192.168.1.50     
@@ -260,7 +260,8 @@ service:
   #       # depth: realsense_camera
 
   - name: nav2
-    path: ./rbnx-boot/cache/service-navigation-rbnx
+    url: https://github.com/syswonder/service-navigation-rbnx
+    branch: main
     manifest: package_manifest.jetson-native.yaml
     config:
       params_file: config/nav2_params.yaml
