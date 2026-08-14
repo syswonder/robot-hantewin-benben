@@ -1,7 +1,7 @@
 # Hantewin BenBen — Robonix Robot Deployment
 
 <p align="center">
-  <img src="assets/benben.jpg" alt="Hantewin BenBen Robot" width="600">
+  <img src="assets/robot.jpg" alt="Hantewin BenBen Robot" width="600">
 </p>
 
 Robonix deployment repository for the **Hantewin BenBen** mobile robot.
@@ -96,7 +96,7 @@ Before booting, complete the following setup:
 │   └── monitor_odom_drift.py
 │
 ├── assets/
-│   └── benben.jpg
+│   └── robot.jpg
 └── rbnx-boot/                     # runtime instances, cache, and logs
 ```
 
