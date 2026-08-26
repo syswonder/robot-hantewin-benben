@@ -4,8 +4,9 @@
 planner_server:
   ros__parameters:
     use_sim_time: false
-    expected_planner_frequency: 5.0
+    expected_planner_frequency: 10.0
     planner_plugins: ["GridBased"]
+
     GridBased:
       plugin: "robonix_nav2_terminal::GoalAwareNavfnPlanner"
       # Prefer a zero-unknown route. If none exists for a known goal, accept
@@ -13,26 +14,36 @@ planner_server:
       max_unknown_ratio: 0.05
       max_unknown_length: 0.75
       max_unknown_run: 0.40
+
     GridBased_known:
       tolerance: 0.5
       allow_unknown: false
+
     GridBased_unknown:
       tolerance: 0.5
       allow_unknown: true
-    tf_buffer_duration: 0.5  # 秒
+
+    tf_buffer_duration: 0.5
 
 
 controller_server:
   ros__parameters:
     use_sim_time: false
     odom_topic: "__ROBONIX_ODOM_TOPIC__"
-    controller_frequency: 5.0
-    # min_x_velocity_threshold: 0.01
-    # min_y_velocity_threshold: 0.01
-    # min_theta_velocity_threshold: 0.01
+
+    # 10 Hz generally provides timely corrections without making DWB react
+    # excessively to small localization, odometry, or costmap fluctuations.
+    controller_frequency: 10.0
+
+    # Ignore small odometry velocity noise.
+    min_x_velocity_threshold: 0.01
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.02
+
     failure_tolerance: 0.5
+
     progress_checker_plugin: "progress_checker"
-    goal_checker_plugins: ["general_goal_checker"] # "precise_goal_checker"
+    goal_checker_plugins: ["general_goal_checker"]
     controller_plugins: ["FollowPath"]
 
     # Progress checker parameters
@@ -40,6 +51,7 @@ controller_server:
       plugin: "nav2_controller::SimpleProgressChecker"
       required_movement_radius: 0.1
       movement_time_allowance: 30.0
+
     # Goal checker parameters
     general_goal_checker:
       # ControllerServer resets ordinary goal checkers on every global replan.
@@ -51,53 +63,92 @@ controller_server:
       yaw_exit_tolerance: 0.20
       stopped_linear_velocity: 0.05
       stopped_angular_velocity: 0.05
+
     # DWB parameters
     FollowPath:
       # Keep final-heading control inside DWB. The RotationShim experiment
       # repeatedly re-entered in-place rotation after wheel-slip changed XY.
       plugin: "dwb_core::DWBLocalPlanner"
-      debug_trajectory_details: True
-      min_vel_x: 0.00
+
+      debug_trajectory_details: true
+
+      # Velocity limits
+      min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.3
+      max_vel_x: 0.5
       max_vel_y: 0.0
-      max_vel_theta: 0.6
-      # min_vel_theta: 0.05
+
+      # Limit ordinary path-following angular corrections to reduce
+      # left-right oscillation on straight paths.
+      max_vel_theta: 0.4
+
       min_speed_xy: 0.0
-      max_speed_xy: 0.4
-      # Include zero and very small yaw commands so the terminal latch can
-      # settle instead of oscillating around a nonzero minimum speed.
+      max_speed_xy: 0.5
+
+      # Keep zero angular velocity as a valid sample so DWB can command
+      # genuinely straight motion.
       min_speed_theta: 0.0
-      # Add high threshold velocity for turtlebot 3 issue.
-      # https://github.com/ROBOTIS-GIT/turtlebot3_simulations/issues/75
+
+      # Acceleration limits
       acc_lim_x: 0.5
       acc_lim_y: 0.0
-      acc_lim_theta: 1.0
+      acc_lim_theta: 0.7
+
       decel_lim_x: -0.5
-      decel_lim_y: -0.0
-      decel_lim_theta: -1.0
-      vx_samples: 20
-      vy_samples: 5
-      vtheta_samples: 120
-      sim_time: 3.0
+      decel_lim_y: 0.0
+      decel_lim_theta: -0.7
+
+      # Sampling parameters
+      # This robot does not use lateral velocity, so only one Y sample is
+      # required. Reducing angular samples lowers computation load and helps
+      # the controller meet its desired frequency.
+      vx_samples: 15
+      vy_samples: 1
+      vtheta_samples: 40
+
+      # A shorter simulation horizon reduces delayed over-correction on
+      # straight paths while still providing sufficient forward prediction.
+      sim_time: 2.0
+
       linear_granularity: 0.05
       angular_granularity: 0.05
+
       transform_tolerance: 0.5
+
       xy_goal_tolerance: 0.30
       yaw_goal_tolerance: 0.12
       trans_stopped_velocity: 0.05
-      short_circuit_trajectory_evaluation: True
-      stateful: True
-      critics: ["PersistentRotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-      BaseObstacle.scale: 0.015
-      PathAlign.scale: 1.0
-      # PathAlign.forward_point_distance: 0.1
-      # PathAlign.forward_preference: true
-      GoalAlign.scale: 0.2
-      # GoalAlign.forward_point_distance: 0.1
-      # GoalAlign.forward_preference: true
-      PathDist.scale: 0.5
-      GoalDist.scale: 2.0
+
+      short_circuit_trajectory_evaluation: true
+      stateful: true
+
+      critics:
+        [
+          "PersistentRotateToGoal",
+          "Oscillation",
+          "BaseObstacle",
+          "GoalAlign",
+          "PathAlign",
+          "PathDist",
+          "GoalDist"
+        ]
+
+      # Obstacle cost. Lethal trajectories are still rejected independently
+      # of this scale; this value affects scoring among valid trajectories.
+      BaseObstacle.scale: 0.02
+
+      # Make the controller follow the global path more consistently.
+      # The forward point reduces reactions to very small lateral and heading
+      # errors directly underneath the robot.
+      PathAlign.scale: 8.0
+      PathAlign.forward_point_distance: 0.40
+
+      GoalAlign.scale: 4.0
+      GoalAlign.forward_point_distance: 0.40
+
+      PathDist.scale: 8.0
+      GoalDist.scale: 4.0
+
       PersistentRotateToGoal.class: "robonix_nav2_terminal::PersistentRotateToGoalCritic"
       PersistentRotateToGoal.xy_enter_tolerance: 0.30
       PersistentRotateToGoal.xy_exit_tolerance: 0.45
@@ -116,81 +167,108 @@ controller_server:
 bt_navigator:
   ros__parameters:
     use_sim_time: false
-    # The Ranger controller/planner run at 5 Hz. A 100 Hz BT loop repeatedly
-    # starved action acknowledgement callbacks on Jetson; 20 Hz keeps steering
-    # responsive without manufacturing server timeouts under SLAM load.
+
+    # A 20 Hz BT loop keeps steering responsive without overloading callback
+    # processing while SLAM and navigation are running.
     bt_loop_duration: 50
     default_server_timeout: 1000
+
     # Packaged v0.1 tree: one recovery attempt and no physical recovery spin.
     # Humble reads default_nav_to_pose_bt_xml. Keep the legacy key too for
-    # compatibility with older Nav2 releases, but both must select the same
-    # non-physical recovery tree.
+    # compatibility with older Nav2 releases.
     default_bt_xml_filename: "__ROBONIX_BT_XML__"
     default_nav_to_pose_bt_xml: "__ROBONIX_BT_XML__"
+
     tf_buffer_duration: 0.5
+
 
 # Jazzy renamed recoveries_server -> behavior_server and split the single
 # costmap_topic/footprint_topic pair into separate local/global keys.
 behavior_server:
   ros__parameters:
     use_sim_time: false
+
     local_costmap_topic: local_costmap/costmap_raw
     global_costmap_topic: global_costmap/costmap_raw
     local_footprint_topic: local_costmap/published_footprint
     global_footprint_topic: global_costmap/published_footprint
+
     cycle_frequency: 10.0
+
     # navigate.xml only calls Wait, but bt_navigator pre-loads the stock
     # navigate_through_poses recovery tree at activate, which needs the
-    # /spin and /backup action servers — without them bringup aborts
-    # ("Action server spin not available"). Provide them; navigate.xml
-    # still never triggers a physical recovery.
+    # /spin and /backup action servers.
     behavior_plugins: ["wait", "spin", "backup"]
+
     wait:
       plugin: "nav2_behaviors::Wait"
+
     spin:
       plugin: "nav2_behaviors::Spin"
+
     backup:
       plugin: "nav2_behaviors::BackUp"
+
     local_frame: odom
     global_frame: map
     robot_base_frame: base_link
+
     transform_tolerance: 0.1
     simulate_ahead_time: 2.0
+
     max_rotational_vel: 1.0
     min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
 
+
 velocity_smoother:
   ros__parameters:
     use_sim_time: false
+
+    # Keep the smoother faster than the controller so that commands are
+    # interpolated between 10 Hz controller updates.
     smoothing_frequency: 20.0
-    stamp_smoothed_velocity_with_smoothing_time: False
-    scale_velocities: False
+
+    stamp_smoothed_velocity_with_smoothing_time: false
+    scale_velocities: false
     feedback: "OPEN_LOOP"
-    # Match the caps already enforced by controller_server.FollowPath so the
-    # smoother cannot relax the limits the local planner was tuned against.
-    max_velocity: [0.3, 0.0, 0.6]
-    min_velocity: [0.0, 0.0, -0.6]
-    max_accel: [0.5, 0.0, 1.0]
-    max_decel: [-0.5, 0.0, -1.0]
+
+    # Match the DWB limits so the smoother cannot produce velocities or
+    # accelerations outside the local controller's tuned range.
+    max_velocity: [0.5, 0.0, 0.4]
+    min_velocity: [0.0, 0.0, -0.4]
+
+    max_accel: [0.5, 0.0, 0.7]
+    max_decel: [-0.5, 0.0, -0.7]
+
     odom_topic: "__ROBONIX_ODOM_TOPIC__"
     odom_duration: 0.1
-    deadband_velocity: [0.0, 0.0, 0.0]
+
+    # Remove very small alternating angular commands that have no useful
+    # steering effect but can cause visible left-right motion.
+    deadband_velocity: [0.0, 0.0, 0.02]
+
     velocity_timeout: 1.0
+
 
 collision_monitor:
   ros__parameters:
     use_sim_time: false
+
     base_frame_id: "base_link"
     odom_frame_id: "odom"
+
     cmd_vel_in_topic: "cmd_vel_smoothed"
     cmd_vel_out_topic: "cmd_vel"
     state_topic: "collision_monitor_state"
+
     transform_tolerance: 0.3
     source_timeout: 1.0
-    base_shift_correction: False
+    base_shift_correction: false
     stop_pub_timeout: 2.0
+
     polygons: ["FootprintApproach"]
+
     FootprintApproach:
       type: "polygon"
       action_type: "approach"
@@ -198,163 +276,235 @@ collision_monitor:
       time_before_collision: 1.2
       simulation_time_step: 0.1
       min_points: 6
-      visualize: False
-      enabled: True
+      visualize: false
+      enabled: true
+
     observation_sources: ["scan"]
+
     scan:
       type: "scan"
       topic: "__ROBONIX_SCAN_TOPIC__"
       min_height: 0.15
       max_height: 2.0
-      enabled: True
+      enabled: true
+
 
 docking_server:
   ros__parameters:
     use_sim_time: false
+
     controller_frequency: 50.0
     initial_perception_timeout: 5.0
     wait_charge_timeout: 5.0
     dock_approach_timeout: 30.0
+
     undock_linear_tolerance: 0.05
     undock_angular_tolerance: 0.1
+
     max_retries: 3
+
     base_frame: "base_link"
     fixed_frame: "odom"
+
     dock_backwards: false
     dock_prestaging_tolerance: 0.5
 
     # No physical dock exists on this robot yet. A non-empty dock_plugins is
-    # required for docking_server to activate (an empty list fails ROS 2's
-    # parameter type inference and crashes the node), but no dock instance
-    # is declared below, so DockRobot has nothing to target until one is added.
-    dock_plugins: ['simple_charging_dock']
+    # required for docking_server to activate.
+    dock_plugins: ["simple_charging_dock"]
+
     simple_charging_dock:
-      plugin: 'opennav_docking::SimpleChargingDock'
+      plugin: "opennav_docking::SimpleChargingDock"
       docking_threshold: 0.05
       staging_x_offset: -0.7
+
       use_external_detection_pose: true
       use_battery_status: false
       use_stall_detection: false
+
       external_detection_timeout: 1.0
       external_detection_translation_x: -0.18
       external_detection_translation_y: 0.0
       external_detection_rotation_roll: -1.57
       external_detection_rotation_pitch: -1.57
       external_detection_rotation_yaw: 0.0
+
       filter_coef: 0.1
+
 
 local_costmap:
   local_costmap:
     ros__parameters:
+      use_sim_time: false
+
       update_frequency: 10.0
       publish_frequency: 10.0
+
       global_frame: odom
       robot_base_frame: base_link
-      use_sim_time: false
+      transform_tolerance: 0.5
+
       rolling_window: true
-      width: 3
-      height: 3
+      width: 5
+      height: 5
       resolution: 0.05
+
       footprint: "__ROBONIX_FOOTPRINT__"
       footprint_padding: 0.05
-      # robot_radius: 0.32
 
       plugins: ["obstacle_layer", "inflation_layer"]
+
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: true
         observation_sources: scan
+
         scan:
           topic: "__ROBONIX_SCAN_TOPIC__"
-          max_obstacle_height: 2.0
+          data_type: "LaserScan"
+
           marking: true
           clearing: true
-          qos:
-            reliability: best_effort
-            durability: volatile
+
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+
+          obstacle_min_range: 0.0
+          obstacle_max_range: 5.0
+
+          raytrace_min_range: 0.0
+          raytrace_max_range: 6.0
+
+          # The scan is generated by projecting a 3D point cloud. Keeping a
+          # short history reduces frame-to-frame obstacle flicker without
+          # retaining dynamic obstacles for too long.
+          observation_persistence: 0.2
+
+          # Disable stale-data checks while the actual scan frequency is not
+          # configured here.
+          expected_update_rate: 0.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
         inflation_radius: 0.60
+        cost_scaling_factor: 2.2
+
+      # Useful for RViz diagnostics. This increases communication bandwidth,
+      # but a 5 x 5 m local costmap remains reasonably small.
+      always_send_full_costmap: true
 
 
 global_costmap:
   global_costmap:
     ros__parameters:
       use_sim_time: false
-      global_frame: map          # 通常是 map
+
+      global_frame: map
       robot_base_frame: base_link
-      # robot_radius: 0.32
+      transform_tolerance: 0.5
+
       footprint: "__ROBONIX_FOOTPRINT__"
       footprint_padding: 0.05
-      update_frequency: 1.0      # 更新频率（Hz），比 local_costmap 低即可
-      publish_frequency: 1.0     # 发布频率
-      resolution: 0.05           # 分辨率，建议和地图一致
 
-      rolling_window: false      # 🚫 不要滚动，通常设置为 false
-      track_unknown_space: true  # 路径规划时是否考虑未知区域
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      resolution: 0.05
+
+      rolling_window: false
+      track_unknown_space: true
+
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
 
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_topic: "__ROBONIX_MAP_TOPIC__"
         map_subscribe_transient_local: true
+        subscribe_to_updates: true
         enabled: true
 
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: true
         observation_sources: scan
+
         scan:
           topic: "__ROBONIX_SCAN_TOPIC__"
-          max_obstacle_height: 2.0
+          data_type: "LaserScan"
+
           marking: true
           clearing: true
+
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+
+          obstacle_min_range: 0.0
+          obstacle_max_range: 5.0
+
+          raytrace_min_range: 0.0
+          raytrace_max_range: 6.0
+
+          # A short persistence helps stabilize projected 3D scan obstacles.
+          observation_persistence: 0.2
+          expected_update_rate: 0.0
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         enabled: true
+
         # Keep the global clearance envelope consistent with the local
-        # controller.  A 2 m gradient overwhelms newly-created local maps and
-        # can make every useful route prohibitively expensive near one wall.
+        # controller.
         inflation_radius: 0.60
         cost_scaling_factor: 2.2
+
+      always_send_full_costmap: true
 
 
 waypoint_follower:
   ros__parameters:
     use_sim_time: false
+
     loop_rate: 20
     stop_on_failure: false
     action_server_result_timeout: 900.0
+
     waypoint_task_executor_plugin: "wait_at_waypoint"
+
     wait_at_waypoint:
       plugin: "nav2_waypoint_follower::WaitAtWaypoint"
-      enabled: True
+      enabled: true
       waypoint_pause_duration: 200
+
 
 route_server:
   ros__parameters:
     use_sim_time: false
+
     boundary_radius_to_achieve_node: 1.0
     radius_to_achieve_node: 2.0
     smooth_corners: true
+
     operations: ["AdjustSpeedLimit", "ReroutingService"]
+
     ReroutingService:
       plugin: "nav2_route::ReroutingService"
+
     AdjustSpeedLimit:
       plugin: "nav2_route::AdjustSpeedLimit"
+
     edge_cost_functions: ["DistanceScorer"]
+
     DistanceScorer:
       plugin: "nav2_route::DistanceScorer"
 
-# nav2_bringup's navigation_launch.py hardcodes this list itself and
-# overrides whatever is set here -- kept accurate for reference only.
+
+# nav2_bringup's navigation_launch.py hardcodes this list itself and overrides
+# whatever is set here. It is kept accurate for reference only.
 lifecycle_manager:
   ros__parameters:
     use_sim_time: false
     autostart: true
+
     node_names:
       - controller_server
       - smoother_server

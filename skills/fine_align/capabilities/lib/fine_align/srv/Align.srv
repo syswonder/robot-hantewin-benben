@@ -1,0 +1,8 @@
+# 微调机器人底盘位置，使目标物体进入机械臂可抓取区域（闭环）。
+# object_name 传给 nero_grasp.detect 用于 VLM 检测。
+string object_name
+---
+bool success
+float64 iterations      # 实际执行的微调步数
+float64[] robot_xyz     # 最终物体位置（robot_base 系）；未检测到为空
+string message

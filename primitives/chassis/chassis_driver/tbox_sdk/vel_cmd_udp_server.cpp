@@ -19,7 +19,7 @@ static const int         UDP_PORT                = 11451;
 static const char*       CMD_VEL_TOPIC           = "/cmd_vel/input/manual";
 static const char*       MODE_TOPIC              = "/Mode";
 static const int8_t      MANUAL_MODE_VALUE       = 1;
-static const double      CONT_TIMEOUT_SEC        = 0.075;   // type=1 连续模式超时 75ms
+static const double      CONT_TIMEOUT_SEC        = 1.0;     // type=1 连续模式超时(放宽到1s, 容忍UDP抖动, 避免"一抽一抽")
 
 static const double      SINGLE_LINEAR_SPEED     = 0.5;     // forward_m 模式默认线速度 (m/s)
 static const double      SINGLE_ANGULAR_SPEED    = 0.5;     // rotate_deg 模式默认角速度 (rad/s)
@@ -260,9 +260,20 @@ private:
           if ((now - last_continuous_time).toSec() > CONT_TIMEOUT_SEC)
           {
             in_continuous_mode = false;
-            // 连续模式超时，切换到自动导航模式
-            switchToAutonomousMode();
-            ROS_INFO("Continuous mode timeout, switched to autonomous mode");
+            // 强制锁：超时只把 manual 通道速度归零（停车），但保持 /Mode=1
+            // 不再切回自动模式，避免与板载 move_base/business_server 在
+            // /cmd_vel 汇合处反复抢控制权造成"一抽一抽"。
+            geometry_msgs::Twist zero;
+            pub_.publish(zero);
+            ROS_INFO("Continuous mode timeout, stopped (kept manual mode)");
+          }
+          else
+          {
+            // 强制锁：连续控制期间持续重发 /Mode=1，压过板载节点发布的 /Mode=0。
+            std_msgs::Int8 lock;
+            lock.data = 1;
+            mode_pub_.publish(lock);
+            current_mode_ = 1;
           }
         }
       }

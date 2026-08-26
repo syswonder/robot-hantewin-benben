@@ -462,7 +462,7 @@ def init(cfg):
     # ── Config ──
     scan_topic = (
         cfg.get("scan_topic")
-        or os.environ.get("LAKIBEAM1_SCAN_TOPIC", "/scan")
+        or os.environ.get("LAKIBEAM1_SCAN_TOPIC", "/scan_filter")
     )
     scan_hz = float(
         cfg.get("scan_hz")
@@ -474,11 +474,7 @@ def init(cfg):
     #     or os.environ.get("LAKIBEAM1_ROS1_PUBLISHER_URI")
     #     or "http://192.168.10.1:39233/"
     # )
-    ros1_topic = (
-        cfg.get("ros1_topic")
-        or os.environ.get("LAKIBEAM1_ROS1_TOPIC")
-        or "/scan_filter"
-    )
+    ros1_topic = scan_topic
     port = get_topic_publisher_port(ros1_topic)
     if port is None:
         return Err(f"Failed to get publisher port for topic {ros1_topic}")
@@ -508,8 +504,9 @@ def init(cfg):
     from sensor_msgs.msg import LaserScan  # type: ignore
     _scan_pub = lakibeam1_lidar.create_publisher(
         "robonix/primitive/lidar/lidar",
-        topic=scan_topic, msg_type=LaserScan, qos="reliable",
+        topic=scan_topic, msg_type=LaserScan, qos="best_effort",
     )
+    # lakibeam1_lidar.declare_ros2_topic("robonix/primitive/lidar/lidar",topic=scan_topic, msg_type=LaserScan, qos="best_effort")
 
     from robonix_api.ros import RosBackend
     _clock = RosBackend.get().node.get_clock()

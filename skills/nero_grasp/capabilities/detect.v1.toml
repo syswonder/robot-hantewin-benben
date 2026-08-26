@@ -1,0 +1,8 @@
+[contract]
+id      = "robonix/skill/nero_grasp/detect"
+version = "1"
+kind    = "skill"
+idl     = "nero_grasp/srv/NeroDetect.srv"
+
+[mode]
+type = "rpc"

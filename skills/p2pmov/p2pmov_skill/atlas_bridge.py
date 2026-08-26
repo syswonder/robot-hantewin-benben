@@ -114,7 +114,7 @@ def init(cfg):
     NOT touched here (authorization is heavy and may take up to ~30 s);
     it is initialized on the first CMD_ACTIVATE."""
     global _init_cfg
-    token = cfg.get("token") or os.environ.get("P2PMOV_TOKEN", "")
+    token = cfg.get("token") or os.environ.get("BENBEN_TBOX_TOKEN", "")
     map_name = cfg.get("map_name") or os.environ.get("P2PMOV_MAP_NAME", "")
     if not token:
         return Err("token required: set config.token (or P2PMOV_TOKEN)")

@@ -1,0 +1,33 @@
+# fine_align — closed-loop chassis fine-alignment skill.
+#
+# kind: skill (user-invocable atomic intent). After nav2 (or p2pmov) parks
+# the base "near" a target, this skill drives small chassis corrections so a
+# detected object lands inside the arm's graspable zone, then returns — the
+# caller follows with nero_grasp.grasp.
+#
+# Upstream deps (resolved through Atlas):
+#   * nero_grasp.detect          (MCP)  — object position in robot_base frame
+#   * chassis.move               (MCP)  — forward_m / rotate_deg burst motion
+#   * chassis odom  (ROS /odom)         — closed-loop displacement feedback
+#
+# The base_link -> robot_base mount transform and the graspable-zone box are
+# deployment-configurable (see config.spec); both are placeholders until
+# measured on the physical robot.
+manifestVersion: 1
+
+package:
+  name: robonix.skill.fine_align
+  version: 0.1.0
+  description: Closed-loop chassis fine-alignment to bring a detected object into the arm graspable zone.
+  tags: [skill, fine-align, approach, chassis, grasp, benben]
+  maintainers: [hty]
+  license: MulanPSL-2.0
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+capabilities:
+  - name: robonix/skill/fine_align/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/fine_align/align
+    path: capabilities/align.v1.toml

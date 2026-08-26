@@ -23,5 +23,7 @@ capabilities:
     path: capabilities/driver.v1.toml
   - name: robonix/skill/nero_grasp/grasp
     path: capabilities/grasp.v1.toml
+  - name: robonix/skill/nero_grasp/detect
+    path: capabilities/detect.v1.toml
 
 depends: []

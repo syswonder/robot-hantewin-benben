@@ -1,0 +1,35 @@
+# Chassis IMU primitive for Hantewin BenBen.
+#
+# One device = one package. This driver owns the chassis controller's
+# built-in 6-axis IMU surface:
+#   robonix/primitive/imu/imu      -> ROS2 topic_out (sensor_msgs/Imu, /imu)
+#   robonix/primitive/imu/snapshot -> MCP one-shot Imu capture
+#   robonix/primitive/imu/driver   -> gRPC LifecycleDriver.Driver(INIT/...)
+#
+# The BenBen chassis controller publishes sensor_msgs/Imu on a remote ROS1
+# node (/imu_data). This driver bridges that stream to ROS 2 via direct
+# TCPROS subscription - the same pattern used by the chassis driver for
+# /odom and the LakiBeam1 lidar driver for /scan_filter. No ROS 1
+# environment is required on the host.
+#
+# Lifecycle: start.sh launches the atlas bridge ONLY. `rbnx boot` then
+# calls Driver(CMD_INIT, config_json) - that handler starts the ROS1
+# TCPROS receiver, waits for the first Imu, creates the ROS 2
+# publisher + timer, and only then returns ok.
+manifestVersion: 1
+
+package:
+  name: robonix.primitive.hantewin.benben.chassis_imu
+  version: 0.1.0
+  description: BenBen chassis IMU driver - ROS1 TCPROS Imu bridge to ROS2.
+  tags: [primitive, imu, chassis, hantewin, benben]
+  maintainers: [futaba19-c <futaba19c@foxmail.com>]
+  license: MulanPSL-2.0
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+capabilities:
+  - name: robonix/primitive/imu/imu
+  - name: robonix/primitive/imu/snapshot
+  - name: robonix/primitive/imu/driver

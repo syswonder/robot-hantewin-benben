@@ -26,28 +26,26 @@ RGBD/NeighborLinkRefining: true
 RGBD/ProximityBySpace: true
 RGBD/AngularUpdate: 0.1
 RGBD/LinearUpdate: 0.1
-Vis/MinInliers: 15                          # 适中的内点数要求（2D雷达点云密度较低）
+Vis/MinInliers: 12                          # 原值：比默认 20 宽松，适配 2D 激光特征
 Rtabmap/DetectionRate: 1.0
 
-# ICP 配置：严格但合理的匹配要求（2D雷达）
-Icp/MaxCorrespondenceDistance: 0.15         # 匹配距离 15cm（2D 雷达适中值）
-Icp/MaxTranslation: 0.3                     # 最大平移 30cm
-Icp/MaxRotation: 0.52                       # 最大旋转 30°
-Icp/CorrespondenceRatio: 0.4                # 至少 40% 的点能匹配（2D 降低要求）
+# ICP 配置：恢复原文件的宽松值。2D 激光特征少，阈值过紧会导致 localization
+# 匹配不上而放弃修正（表现为 initialpose 后 Δ=0、旋转持续漂移）。
+# 翻倍
+Icp/MaxCorrespondenceDistance: 0.2
+Icp/MaxTranslation: 1.0
+Icp/MaxRotation: 1.57
+# 0 = 使用外部里程计，订阅 /odom 话题
+Odom/Strategy: 0
 
-# 重定位验证：拒绝低质量匹配
-Rtabmap/LoopThr: 0.15                       # 回环检测阈值（越高越严格，默认 0.11）
-Mem/RehearsalSimilarity: 0.6                # 相似度阈值（越高越严格，默认 0.6）
-RGBD/OptimizeFromGraphEnd: false            # localization 模式下不从图末端优化
+# 注意：RGBD/ProximityGlobalScanMap=true 会触发 RTAB-Map 0.22 的崩溃：
+#   [FATAL] Rtabmap.cpp:2953 Condition (_globalScanMapPoses.find(nearestId)
+#   != _globalScanMapPoses.end()) not met! [Pose of N not found in global scan poses]
+# 必须保持 false（默认值），否则 localization/mapping 邻近检测直接 abort。
+RGBD/ProximityGlobalScanMap: false
 
-# 初始位置设置验证（关键！）
-Mem/IncrementalMemory: false                # localization 模式：不增量建图，只定位
-Mem/STMSize: 1                              # 短期记忆大小设为 1（localization 模式）
-Rtabmap/StartNewMapOnLoopClosure: false     # 不在回环时创建新地图
+# 邻近检测半径：全局扫描地图内做匹配的搜索范围
+RGBD/LocalRadius: 10
 
-# 启用持续定位修正（关键！防止漂移）
-RGBD/ProximityPathMaxNeighbors: 10          # 邻近路径最大邻居数
-RGBD/LocalRadius: 10                        # 本地半径 10m 内搜索匹配
-RGBD/ProximityAngle: 45                     # 邻近角度 45°
-RGBD/ProximityByTime: false                 # 不按时间，按空间邻近
-Rtabmap/TimeThr: 0                          # 时间阈值设为 0，始终尝试闭环
+# 回环检测阈值：默认 0.11，保持默认即可（过紧同样会让 localization 匹配被拒）
+Rtabmap/LoopThr: 0.11

@@ -275,8 +275,14 @@ def _publish_odom() -> None:
         msg.pose.pose.orientation.w = ow
         msg.pose.covariance = list(odom["pose_covariance"])
         msg.twist.twist.linear.x = lx
-        msg.twist.twist.linear.y = ly
-        msg.twist.twist.linear.z = lz
+        # This chassis is differential (no lateral/holonomic motion), but the
+        # onboard odometry reports a spurious lateral velocity that scales with
+        # rotation (|vy| ~= |vz| ~= 0.16*wz). DWB runs stateful and seeds its
+        # trajectory predictor from this twist, so a phantom vy/vz makes it
+        # mispredict a lateral slide during turns -> erratic steering / wall
+        # clipping. Zero them out; the pose (x/y/yaw) is untouched.
+        msg.twist.twist.linear.y = 0.0
+        msg.twist.twist.linear.z = 0.0
         msg.twist.twist.angular.x = ax
         msg.twist.twist.angular.y = ay
         msg.twist.twist.angular.z = az

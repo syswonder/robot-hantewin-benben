@@ -1,0 +1,9 @@
+[contract]
+id      = "robonix/skill/fine_align/driver"
+version = "1"
+kind    = "skill"
+idl     = "lifecycle/srv/Driver.srv"
+description = "Lifecycle control interface for fine_align skill."
+
+[mode]
+type = "rpc"

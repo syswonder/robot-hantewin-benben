@@ -6,7 +6,7 @@ import logging
 import time
 
 from robonix_api import ATLAS, Err, Ok, Skill
-from nero_grasp_mcp import NeroGrasp_Request, NeroGrasp_Response
+from nero_grasp_mcp import NeroDetect_Request, NeroDetect_Response, NeroGrasp_Request, NeroGrasp_Response
 from std_msgs_mcp import String
 
 from .arm_client import ArmClient
@@ -179,6 +179,38 @@ def grasp(req: NeroGrasp_Request) -> NeroGrasp_Response:
     return NeroGrasp_Response(
         success=True,
         message=String(data=f"grasp sequence completed on [{arms_text}]"),
+    )
+
+
+@provider.mcp("robonix/skill/nero_grasp/detect")
+def detect(req: NeroDetect_Request) -> NeroDetect_Response:
+    """只检测目标物体在机器人基座系下的位置，不移动机械臂。
+
+    供 fine_align 等下游 skill 在抓取前读取物体位置、做底盘微调。
+    Args:
+        object_name: 目标物体标签；空则用 manifest detector_settings.instruction。
+    Returns:
+        found=False 表示未检测到（相机未连接 / VLM 无结果 / 深度采样失败）。
+    """
+    if _cfg is None:
+        return NeroDetect_Response(found=False, message=String(data="nero_grasp is not initialized"))
+    if _camera is None:
+        return NeroDetect_Response(found=False, message=String(data="camera is not connected"))
+    object_name = (req.object_name or "").strip() or None
+    try:
+        target = _camera.detect_object(object_name=object_name)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("detect failed")
+        return NeroDetect_Response(found=False, message=String(data=str(exc)))
+    if target is None:
+        return NeroDetect_Response(found=False, message=String(data="no target detected"))
+    return NeroDetect_Response(
+        found=True,
+        robot_xyz=[float(v) for v in target.robot_xyz],
+        camera_xyz=[float(v) for v in (target.camera_xyz or [])],
+        label=target.label or "object",
+        confidence=float(target.confidence),
+        message=String(data="ok"),
     )
 
 

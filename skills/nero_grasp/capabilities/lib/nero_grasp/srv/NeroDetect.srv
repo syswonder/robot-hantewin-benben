@@ -1,0 +1,10 @@
+# 只检测目标物体在机器人基座系下的位置，不移动机械臂。
+# object_name 为空时使用 manifest detector_settings.instruction。
+string object_name
+---
+bool found
+float64[] robot_xyz      # [x, y, z] 米，robot_base 坐标系（臂基座系）
+float64[] camera_xyz     # [x, y, z] 米，相机坐标系；无检测时为空
+string label             # 检测到的类别标签（无则 "object"）
+float64 confidence
+std_msgs/String message

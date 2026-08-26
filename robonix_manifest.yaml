@@ -4,7 +4,7 @@ name: robonix-hty
 
 catalog:
   name: robonix.robot.hantewin.benben
-  version: 0.1.0
+  version: 0.2.0
   description: "Robonix deploy manifest for the Hantewin Benben"
   tags: [robot, deploy, hantewin, benben, jetson, lidar, rgbd, scene, mapping]
   license: Apache-2.0
@@ -14,7 +14,7 @@ catalog:
 env:
   LOG: "INFO"
   ROS_DOMAIN_ID: "0"
-  # RMW_IMPLEMENTATION: rmw_zenoh_cpp
+  # RMW_IMPLEMENTATION: rmw_fastrtps_cpp # rmw_zenoh_cpp 
   SCENE_NATIVE_PYTHON: /home/hty/pyenv/env/bin/python3
   # hf-mirror.com 302/308-redirects Xet-backed files (like this CLIP
   # checkpoint) cross-domain back to huggingface.co; huggingface_hub only
@@ -36,9 +36,13 @@ env:
   MAPPING_WEBUI_HOST: "0.0.0.0"
   ROBONIX_NAV2_FORCE: native
   ROBONIX_NAV2_PLATFORM: jetson_thor
-  SCENE_MAP_ID: f27_v3
+  SCENE_MAP_ID: outsides
   SCENE_RESTORE_ON_START: "true"
   MAPPING_MAPS_DIR: ${HOME}/.robonix/maps
+  SCENE_GRAPH_ENABLED: "false"
+  SCENE_GRAPH_CAPTION_ENABLED: "false"
+  SCENE_GRAPH_RELATION_ENABLED: "false"
+  SCENE_GRAPH_IMAGE_RELATIONS: "false"
   # load_map verify: rtabmap regenerates the grid slightly differently on DB
   # reload (boundary/unknown cells), so the stock 0.999/0.995 thresholds reject
   # every legit load (v2_27f measured agreement=0.991 occ=0.971 free=0.967).
@@ -74,11 +78,11 @@ system:
   liaison:
     listen: 0.0.0.0:50081
     log: info
-  # scene:
-  #   log: info
-  #   manifest: package_manifest.jetson-native.yaml
-  #   camera_provider_id: realsense_camera
-  #   web_port: 50107 
+  scene:
+    log: info
+    manifest: package_manifest.jetson-native.yaml
+    # camera_provider_id: realsense_camera
+    web_port: 50107 
 primitive: 
   - name: mid360_lidar
     path: ./primitives/primitive-livox-mid360-lidar-rbnx
@@ -91,12 +95,14 @@ primitive:
       extrinsics:
         x: 0.0
         y: 0.0
-        z: 0.0
+        z: 1.0
         roll: 0.0
         pitch: 0.0
         # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
         # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
-        yaw: 0
+        yaw: 1.5707963267948966
+
+
   - name: audio_client_bridge
     url: https://github.com/syswonder/primitive-audio-client-bridge-rbnx
     branch: main
@@ -113,25 +119,25 @@ primitive:
       speaker_device: plughw:CARD=Plus,DEV=0
       speaker_sample_rate: 16000
 
-  - name: lakibeam1_lidar
-    path: /home/hty/robot-hantewin-benben/primitives/lakiBeam1-lidar
-    config:
-      # lidar_ip: 192.168.1.133
-      # host_ip: 192.168.1.50     
-      # ros1_publisher_uri: http://192.168.10.1:40623/
-      scan_hz: 20.0 
-      scan_topic: /scan
-      frame_id: laser
-      parent_frame: base_link
-      extrinsics:
-        x: 0.0
-        y: 0.0
-        z: 0.0
-        roll: 0.0
-        pitch: 0.0
-        # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
-        # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
-        yaw: 0.0
+  # - name: lakibeam1_lidar
+  #   path: ./primitives/lakiBeam1-lidar
+  #   config:
+
+  #     ros1_target_ip: 192.168.10.1
+  #     scan_hz: 20.0
+  #     scan_topic: /scan_filter
+  #     frame_id: laser
+  #     parent_frame: base_link
+  #     sentinel_timeout_s: 15.0
+  #     extrinsics:
+  #       x: 0.0
+  #       y: 0.0
+  #       z: 0.0
+  #       roll: 0.0
+  #       pitch: 0.0
+  #       # ros2 tf2_ros static_transform_publisher's --yaw takes radians, not
+  #       # degrees (see mid360_driver/main.py _spawn_stp). 90 deg = pi/2 rad.
+  #       yaw: 0.0
 
   - name: mid360_imu
     path: ./primitives/primitive-livox-mid360-imu-rbnx
@@ -152,21 +158,39 @@ primitive:
 
   # Publishes the Soma-owned Lite3 URDF as /robot_description and the standard
   # TF tree. Soma remains the single authoritative source for the robot model.
-  - name: robot_description
-    url: https://github.com/syswonder/primitive-robot-description-rbnx
-    branch: main
-    manifest: package_manifest.native.yaml
+  # - name: robot_description
+  #   url: https://github.com/syswonder/primitive-robot-description-rbnx
+  #   branch: main
+  #   manifest: package_manifest.native.yaml
 
   - name: benben_chassis
     path: ./primitives/chassis
     config:
-      token: "gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY="
+      token: ${BENBEN_TBOX_TOKEN}
       odom_frame: odom
       base_frame: base_link
       odom_topic: /odom
       odom_hz: 30
+      twist_in_topic: /cmd_vel
+      ros1_target_ip: 192.168.10.1
+      ros1_target_port: 11451
+      ros1_odom_topic: /odom
+      odom_sentinel_timeout_s: 15.0
       # ros1_odom_publisher_uri: http://192.168.10.1:36119/
 
+
+  # - name: chassis_imu
+  #   path: ./primitives/chassis_imu
+  #   config:
+  #     imu_topic: /imu
+  #     imu_hz: 100.0
+  #     frame_id: imu_link
+  #     parent_frame: base_link
+  #     ros1_target_ip: 192.168.10.1
+  #     ros1_imu_topic: /imu_data
+  #     sentinel_timeout_s: 15.0
+
+      
   # - name: right_arm
   #   path: ../agilex_nero/agilex_nero/primitives/nero_arm
   #   config:
@@ -211,53 +235,30 @@ service:
     path: ./services/service-map-rbnx
     manifest: package_manifest.jetson-native.yaml
     config:
-      map_id: f27_v3
+      map_id: outside
       sensor_providers:
         lidar3d: mid360_lidar
-        lidar2d: lakibeam1_lidar
+        # lidar2d: lakibeam1_lidar
         imu: mid360_imu
+        # imu: chassis_imu
         odom: benben_chassis
         # rgb: realsense_camera
         # depth: realsense_camera
       algo: rtabmap
-      map_mode: mapping # localization
-      deskew_lidar: true
+      map_mode: localization  # localization
+      deskew_lidar: true # 2d雷达则不需要去畸变
       params_file: config/rtabmap_params.yaml
-      lidar_frame: laser                     # 改用 2D 雷达（lakibeam1）进行定位
+      lidar_frame: laser                    # 改用 2D 雷达（lakibeam1）进行定位
       lidar_base_extrinsic:
         x: 0.0
         y: 0.0
         z: 0.0                               # 2D 雷达在底部，z=0
         roll: 0.0
         pitch: 0.0
-        yaw: 0.0
-      rtabmap_params:
+        yaw: 0.0   #1.5707963267948966
+      rtabmap_params: 
         Grid/FootprintLength: 0.84
         Grid/FootprintWidth: 0.60
-  # - name: mapping
-  #   url: https://github.com/syswonder/service-map-rbnx
-  #   branch: main
-  #   manifest: package_manifest.jetson-native.yaml
-  #   config:
-  #     webui_port: 8091
-  #     webui_host: 0.0.0.0
-  #     # Production localization uses chassis odometry. The timestamped Mid360
-  #     # cloud is deskewed against odom before RTAB-Map consumes it.
-  #     # Use RGB for visual constraints and fuse depth with Mid360 occupancy.
-  #     # Camera data stays inside RTAB-Map; Nav2 LaserScan remains lidar-only.
-  #     # Use the chassis odom until a separately declared Mid360 LIO provider
-  #     # passes the static-drift gate. RTAB-Map still fuses RGB-D and Mid360.
-  #     deskew_lidar: true
-  #     # Fuse the front Gemini depth projection with Mid360 in the 2D occupancy
-  #     # grid. Nav2's LaserScan input remains lidar-only.
-  #     # occupancy_sources: [lidar, depth]
-  #     params_file: config/rtabmap_params.yaml
-  #     sensor_providers:
-  #       # lidar3d: mid360_lidar
-  #       lidar2d: lakibeam1_lidar
-  #       odom: benben_chassis
-  #       # rgb: realsense_camera
-  #       # depth: realsense_camera
 
   - name: nav2
     path: ./rbnx-boot/cache/service-navigation-rbnx
@@ -277,7 +278,9 @@ service:
         # Canonical odom owner. Replace with a declared Mid360 LIO provider
         # only after that provider exists and passes the static-drift gate.
         odom: benben_chassis
-        scan_cloud: lakibeam1_lidar # lakibeam1_lidar mid360_lidar
+        scan_cloud: mid360_lidar # lakibeam1_lidar mid360_lidar
+        imu: mid360_imu
+        
   - name: speech
     path: ${ROBONIX_SOURCE_PATH}/services/speech
     config:
@@ -286,11 +289,40 @@ service:
       tencent_asr_appid: ${TENCENT_ASR_APPID}
       tencent_tts_voice_type: 502003     
 
-skill: []
+skill:
+  - name: explore
+    url: https://github.com/syswonder/skill-explore-rbnx
+    branch: main
+    config: {}
+
+  # Closed-loop chassis fine-alignment: after nav2 parks the base near a
+  # target, bring a detected object into the arm graspable zone, then hand
+  # off to nero_grasp. Depends on nero_grasp.detect (MCP) + chassis.move.
+  # TODO: fill graspable_zone + base_to_robot_rotation after measurement.
+  # - name: fine_align
+  #   path: ./skills/fine_align
+  #   config:
+  #     graspable_zone:
+  #       center: [0.0, 0.0, 0.0]
+  #       tolerance: [0.05, 0.05, 0.03]
+  #     base_to_robot_rotation:
+  #       - [1.0, 0.0, 0.0]
+  #       - [0.0, 1.0, 0.0]
+  #       - [0.0, 0.0, 1.0]
+  #     odom_topic: /odom
+  #     max_iterations: 8
+  #     timeout_s: 60.0
+  #     forward_gain: 1.0
+  #     rotate_gain: 1.0
+  #     forward_step_max_m: 0.30
+  #     rotate_step_max_deg: 30.0
+  #     forward_tol_m: 0.02
+  #     lateral_tol_m: 0.02
+
   # - name: p2pmov
   #   path: ./skills/p2pmov
   #   config:
-  #     token: "gmrL3NIiUe7mk2Gv/LbZv6yPs4w+JnpQgKIKDn8/FR/nYMKfKnR93t2jd9VY4qaRhwq9bJUmJ9BN4RYuKnOxUfY="
+
   #     map_name: "bdyjy_27_0805.bin"   # 车上实际地图名
   #     points:
   #       饮水机: {x: 20.22, y: 2.10,yaw: -1.52}
