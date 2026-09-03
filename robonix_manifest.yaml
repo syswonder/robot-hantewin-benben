@@ -273,6 +273,14 @@ service:
         range_max_m: 12.0
         self_filter_margin_m: 0.05
       action_wait_s: 80.0
+      # Terminal-alignment patience (config.spec: guard_* keys feed
+      # ROBONIX_GUARD_* env vars in atlas_bridge._spawn_velocity_guard).
+      # The chassis only realises ~0.12 rad/s effective rotation from the
+      # ~0.15 rad/s terminal commands (skid-steer slip, verified 2026-09-02),
+      # so closing the last ~0.8 rad of yaw error takes 6-7 s. The default
+      # 3 s no-progress window cancelled goals that were still converging.
+      guard_no_progress_s: 8.0
+      guard_terminal_timeout_s: 25.0
       provider_ids:
         map: mapping
         # Canonical odom owner. Replace with a declared Mid360 LIO provider
