@@ -59,8 +59,12 @@ controller_server:
       plugin: "robonix_nav2_terminal::PersistentGoalChecker"
       xy_enter_tolerance: 0.30
       xy_exit_tolerance: 0.45
-      yaw_enter_tolerance: 0.12
-      yaw_exit_tolerance: 0.20
+      # ~30 degrees: retry heading alignment together with the reduced DWB
+      # speeds. The original 0.12 rad (~7 degrees) stalled on skid-steer
+      # wheel slip and was disabled at 3.2 rad; a wider band plus slower
+      # motion may let the terminal rotation converge.
+      yaw_enter_tolerance: 0.52
+      yaw_exit_tolerance: 0.65
       stopped_linear_velocity: 0.05
       stopped_angular_velocity: 0.05
 
@@ -73,30 +77,33 @@ controller_server:
       debug_trajectory_details: true
 
       # Velocity limits
+      # Reduced from 0.5 for gentler terminal approach; must stay in sync with
+      # max_speed_xy and the velocity_smoother limits below.
       min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.5
+      max_vel_x: 0.3
       max_vel_y: 0.0
 
       # Limit ordinary path-following angular corrections to reduce
       # left-right oscillation on straight paths.
-      max_vel_theta: 0.4
+      max_vel_theta: 0.3
 
       min_speed_xy: 0.0
-      max_speed_xy: 0.5
+      max_speed_xy: 0.3
 
       # Keep zero angular velocity as a valid sample so DWB can command
       # genuinely straight motion.
       min_speed_theta: 0.0
 
       # Acceleration limits
-      acc_lim_x: 0.5
+      # Reduced alongside the velocity limits for gentler speed changes.
+      acc_lim_x: 0.3
       acc_lim_y: 0.0
-      acc_lim_theta: 0.7
+      acc_lim_theta: 0.5
 
-      decel_lim_x: -0.5
+      decel_lim_x: -0.3
       decel_lim_y: 0.0
-      decel_lim_theta: -0.7
+      decel_lim_theta: -0.5
 
       # Sampling parameters
       # This robot does not use lateral velocity, so only one Y sample is
@@ -116,7 +123,8 @@ controller_server:
       transform_tolerance: 0.5
 
       xy_goal_tolerance: 0.30
-      yaw_goal_tolerance: 0.12
+      # ~30 degrees, matching yaw_enter_tolerance above.
+      yaw_goal_tolerance: 0.52
       trans_stopped_velocity: 0.05
 
       short_circuit_trajectory_evaluation: true
@@ -150,17 +158,28 @@ controller_server:
       GoalDist.scale: 4.0
 
       PersistentRotateToGoal.class: "robonix_nav2_terminal::PersistentRotateToGoalCritic"
+      # Inside the terminal window this critic must outweigh PathAlign/GoalAlign
+      # (8.0/4.0 with 0.40 m forward points). At the default scale 1.0 those
+      # critics preferred keeping the approach heading, so DWB settled on zero
+      # rotation ~1 rad short of the goal yaw and the guard cancelled. Stock
+      # nav2 uses the same 32.0 convention for RotateToGoal. Outside the
+      # terminal window the critic scores 0, so path following is unaffected.
+      PersistentRotateToGoal.scale: 32.0
       PersistentRotateToGoal.xy_enter_tolerance: 0.30
       PersistentRotateToGoal.xy_exit_tolerance: 0.45
-      PersistentRotateToGoal.yaw_enter_tolerance: 0.12
-      PersistentRotateToGoal.yaw_exit_tolerance: 0.20
+      # ~30 degrees, matching the goal checker yaw tolerances above.
+      PersistentRotateToGoal.yaw_enter_tolerance: 0.52
+      PersistentRotateToGoal.yaw_exit_tolerance: 0.65
       PersistentRotateToGoal.stopped_linear_velocity: 0.05
       PersistentRotateToGoal.max_terminal_angular_velocity: 0.30
       PersistentRotateToGoal.slowing_factor: 3.0
       PersistentRotateToGoal.lookahead_time: 0.5
-      PersistentRotateToGoal.max_terminal_duration: 15.0
-      PersistentRotateToGoal.no_progress_timeout: 3.0
-      PersistentRotateToGoal.min_yaw_progress: 0.04
+      PersistentRotateToGoal.max_terminal_duration: 25.0
+      # Chassis realises only ~0.12 rad/s from the ~0.15 rad/s terminal
+      # commands, so closing ~0.8 rad of yaw error needs 6-7 s of steady
+      # rotation. 5 s aborted goals that were still converging.
+      PersistentRotateToGoal.no_progress_timeout: 10.0
+      PersistentRotateToGoal.min_yaw_progress: 0.02
       PersistentRotateToGoal.rotation_margin: 0.50
 
 
@@ -235,11 +254,11 @@ velocity_smoother:
 
     # Match the DWB limits so the smoother cannot produce velocities or
     # accelerations outside the local controller's tuned range.
-    max_velocity: [0.5, 0.0, 0.4]
-    min_velocity: [0.0, 0.0, -0.4]
+    max_velocity: [0.3, 0.0, 0.3]
+    min_velocity: [0.0, 0.0, -0.3]
 
-    max_accel: [0.5, 0.0, 0.7]
-    max_decel: [-0.5, 0.0, -0.7]
+    max_accel: [0.3, 0.0, 0.5]
+    max_decel: [-0.3, 0.0, -0.5]
 
     odom_topic: "__ROBONIX_ODOM_TOPIC__"
     odom_duration: 0.1

@@ -1,0 +1,3 @@
+[submodule "services/service-navigation-rbnx"]
+	path = services/service-navigation-rbnx
+	url = https://github.com/syswonder/service-navigation-rbnx.git
