@@ -283,8 +283,8 @@ def _publish_odom() -> None:
         # clipping. Zero them out; the pose (x/y/yaw) is untouched.
         msg.twist.twist.linear.y = 0.0
         msg.twist.twist.linear.z = 0.0
-        msg.twist.twist.angular.x = ax
-        msg.twist.twist.angular.y = ay
+        msg.twist.twist.angular.x = 0.0
+        msg.twist.twist.angular.y = 0.0
         msg.twist.twist.angular.z = az
         msg.twist.covariance = list(odom["twist_covariance"])
         _odom_pub.publish(msg)

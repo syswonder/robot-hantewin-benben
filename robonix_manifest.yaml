@@ -261,7 +261,7 @@ service:
         Grid/FootprintWidth: 0.60
 
   - name: nav2
-    path: ./rbnx-boot/cache/service-navigation-rbnx
+    path: ./services/service-navigation-rbnx
     manifest: package_manifest.jetson-native.yaml
     config:
       params_file: config/nav2_params.yaml
