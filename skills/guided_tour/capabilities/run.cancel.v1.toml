@@ -1,0 +1,13 @@
+# robonix/skill/guided_tour/run/cancel — abort the tour (and the active
+# nav2 goal). Idempotent.
+[contract]
+id      = "robonix/skill/guided_tour/run/cancel"
+version = "1"
+kind    = "skill"
+idl     = "guided_tour/srv/CancelTour.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true

@@ -81,15 +81,15 @@ controller_server:
       # max_speed_xy and the velocity_smoother limits below.
       min_vel_x: 0.0
       min_vel_y: 0.0
-      max_vel_x: 0.3
+      max_vel_x: 0.5
       max_vel_y: 0.0
 
       # Limit ordinary path-following angular corrections to reduce
       # left-right oscillation on straight paths.
-      max_vel_theta: 0.3
+      max_vel_theta: 0.6
 
       min_speed_xy: 0.0
-      max_speed_xy: 0.3
+      max_speed_xy: 0.5
 
       # Keep zero angular velocity as a valid sample so DWB can command
       # genuinely straight motion.
@@ -254,7 +254,7 @@ velocity_smoother:
 
     # Match the DWB limits so the smoother cannot produce velocities or
     # accelerations outside the local controller's tuned range.
-    max_velocity: [0.3, 0.0, 0.3]
+    max_velocity: [0.5, 0.0, 0.3]
     min_velocity: [0.0, 0.0, -0.3]
 
     max_accel: [0.3, 0.0, 0.5]

@@ -36,7 +36,7 @@ env:
   MAPPING_WEBUI_HOST: "0.0.0.0"
   ROBONIX_NAV2_FORCE: native
   ROBONIX_NAV2_PLATFORM: jetson_thor
-  SCENE_MAP_ID: outsides
+  SCENE_MAP_ID: 2lou
   SCENE_RESTORE_ON_START: "true"
   MAPPING_MAPS_DIR: ${HOME}/.robonix/maps
   SCENE_GRAPH_ENABLED: "false"
@@ -103,20 +103,20 @@ primitive:
         yaw: 1.5707963267948966
 
 
-  - name: audio_client_bridge
-    url: https://github.com/syswonder/primitive-audio-client-bridge-rbnx
-    branch: main
-    config:
-      transport: reverse
-      listen_host: 0.0.0.0
-      listen_port: 60002
+  # - name: audio_client_bridge
+  #   url: https://github.com/syswonder/primitive-audio-client-bridge-rbnx
+  #   branch: main
+  #   config:
+  #     transport: reverse
+  #     listen_host: 0.0.0.0
+  #     listen_port: 60002
   - name: audio_driver
     url: https://github.com/syswonder/primitive-audio-driver-rbnx
     branch: main
     config:
-      mic_device: plughw:CARD=Plus,DEV=0
-      mic_sample_rate: 16000
-      speaker_device: plughw:CARD=Plus,DEV=0
+      mic_device: pulse
+      mic_sample_rate: 48000
+      speaker_device: pulse
       speaker_sample_rate: 16000
 
   # - name: lakibeam1_lidar
@@ -143,17 +143,17 @@ primitive:
     path: ./primitives/primitive-livox-mid360-imu-rbnx
     config: {}
 
-  - name: realsense_camera
-    url: https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx.git
-    branch: main
-    config:
-      camera_name:        "camera_435i"
-      rgb_profile:        "640x480x30"
-      depth_profile:      "848x480x30"
-      align_depth:        true
-      enable_imu:         false
-      enable_sync:        true
-      sentinel_timeout_s: 30.0
+  # - name: realsense_camera
+  #   url: https://github.com/syswonder/primitive-intel-realsense_d435i-camera-rbnx.git
+  #   branch: main
+  #   config:
+  #     camera_name:        "camera_435i"
+  #     rgb_profile:        "640x480x30"
+  #     depth_profile:      "848x480x30"
+  #     align_depth:        true
+  #     enable_imu:         false
+  #     enable_sync:        true
+  #     sentinel_timeout_s: 30.0
 
 
   # Publishes the Soma-owned Lite3 URDF as /robot_description and the standard
@@ -235,7 +235,7 @@ service:
     path: ./services/service-map-rbnx
     manifest: package_manifest.jetson-native.yaml
     config:
-      map_id: outside
+      map_id: 2lou
       sensor_providers:
         lidar3d: mid360_lidar
         # lidar2d: lakibeam1_lidar
@@ -298,10 +298,24 @@ service:
       tencent_tts_voice_type: 502003     
 
 skill:
-  - name: explore
-    url: https://github.com/syswonder/skill-explore-rbnx
-    branch: main
-    config: {}
+  # - name: explore
+  #   url: https://github.com/syswonder/skill-explore-rbnx
+  #   branch: main
+  #   config: {}
+
+  # 导览：依次前往固定位置（nav2）并在每站语音播报（speech）。
+  # stops 为固定路线，存于 config/guided_tour_stops.json（每站 name / point [x,y,yaw] / announcement）。
+  - name: guided_tour
+    path: ./skills/guided_tour
+    config:
+      frame_id: "map"
+      speech_target: ""
+      poll_interval_s: 2.0
+      navigation_timeout_s: 300.0
+      announce_pause_s: 1.0
+      start_announcement: "导览开始，请跟我来"
+      finish_announcement: "本次导览到此结束，谢谢"
+      stops_file: "/home/hty/robot-hantewin-benben/config/guided_tour_stops.json"
 
   # Closed-loop chassis fine-alignment: after nav2 parks the base near a
   # target, bring a detected object into the arm graspable zone, then hand

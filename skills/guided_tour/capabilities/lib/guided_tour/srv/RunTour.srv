@@ -1,0 +1,10 @@
+# robonix/skill/guided_tour/run — start the guided tour (导览).
+# Visits each configured stop in order: navigate there with nav2, then speak
+# the stop's announcement. Returns immediately with a run_id; poll run/status
+# and abort with run/cancel. Empty `stop_names` runs every stop; otherwise it
+# is a whitespace/comma-separated list of stop names to visit (a subset).
+string stop_names
+---
+bool accepted
+string run_id
+string detail

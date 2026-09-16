@@ -1,0 +1,10 @@
+# robonix/skill/guided_tour/run/status — poll tour progress.
+# Empty `run_id` means the most recent tour.
+string run_id
+---
+bool known
+string state        # PENDING | RUNNING | SUCCEEDED | FAILED | CANCELED
+string phase        # idle | starting | navigating | announcing | finished | canceled | error
+uint32 stop_index   # 1-based index of the current stop; 0 before first / after last
+uint32 total_stops
+string detail       # human-readable progress

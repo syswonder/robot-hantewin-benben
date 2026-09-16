@@ -1,0 +1,14 @@
+# robonix/skill/guided_tour/run — start the guided tour (导览).
+# Visits each configured stop in order (nav2 -> speak). Returns immediately
+# with a run_id; poll run/status, abort with run/cancel.
+[contract]
+id      = "robonix/skill/guided_tour/run"
+version = "1"
+kind    = "skill"
+idl     = "guided_tour/srv/RunTour.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true
