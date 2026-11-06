@@ -1,0 +1,16 @@
+# Lifecycle interface for the tour_guide skill.
+# `rbnx boot` calls Driver(CMD_INIT, config_json) after the skill registers
+# with atlas; on_init parses + validates `config.areas`. CMD_ACTIVATE is fired
+# by the executor on the first LLM call. Without this contract the framework
+# skips the lifecycle servicer entirely, on_init never runs, and the skill
+# sits at ACTIVE with "(no driver)" — so `introduce` would return the
+# unknown-area text instead of the narration.
+[contract]
+id          = "robonix/skill/tour_guide/driver"
+version     = "1"
+kind        = "skill"
+idl         = "lifecycle/srv/Driver.srv"
+description = "Lifecycle control interface for tour_guide skill."
+
+[mode]
+type = "rpc"

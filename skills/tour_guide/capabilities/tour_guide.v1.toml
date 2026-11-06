@@ -1,0 +1,12 @@
+# MCP-callable tour_guide tool. The LLM picks this up via pilot when the
+# prompt matches the tool description — which comes from the handler
+# docstring in tour_guide_skill/main.py, not from this file.
+[contract]
+id      = "robonix/skill/tour_guide/introduce"
+version = "1"
+kind    = "skill"
+idl     = "tour_guide/srv/IntroduceArea.srv"
+description = "导览技能, 用于带领客户参观展厅."
+
+[mode]
+type = "rpc"
