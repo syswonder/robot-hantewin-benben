@@ -1,0 +1,35 @@
+# guided_tour — 导览 (guided tour) skill.
+#
+# kind: skill (user-invocable atomic intent). Visits each configured fixed
+# stop in order: navigate there via nav2 (robonix/service/navigation/*),
+# then speak the stop's announcement aloud (robonix/service/speech/speak).
+# Exposes an async task surface (run -> run/status / run/cancel) so the
+# executor polls progress and can abort a tour mid-route.
+#
+# Upstream deps (resolved through Atlas, no config needed):
+#   * navigation/navigate         (MCP) — start a nav2 goal (PoseStamped)
+#   * navigation/navigate/status  (MCP) — poll nav2 until terminal
+#   * navigation/navigate/cancel  (MCP) — abort the active nav2 goal
+#   * speech/speak                (MCP) — speak an announcement aloud
+manifestVersion: 1
+
+package:
+  name: robonix.skill.guided_tour
+  version: 0.1.0
+  description: 导览 — visit fixed stops in order (nav2) and speak an announcement at each (speech).
+  tags: [skill, tour, navigation, nav2, speech, benben]
+  maintainers: [hty]
+  license: MulanPSL-2.0
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+capabilities:
+  - name: robonix/skill/guided_tour/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/guided_tour/run
+    path: capabilities/run.v1.toml
+  - name: robonix/skill/guided_tour/run/status
+    path: capabilities/run.status.v1.toml
+  - name: robonix/skill/guided_tour/run/cancel
+    path: capabilities/run.cancel.v1.toml

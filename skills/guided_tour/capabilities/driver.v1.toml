@@ -1,0 +1,13 @@
+# Lifecycle interface for the guided_tour skill.
+# `rbnx boot` calls Driver(CMD_INIT, config_json) after the skill registers
+# with atlas; on_init parses the tour route + tunables. CMD_ACTIVATE resolves
+# the nav2 + speech MCP endpoints (lazy, on first LLM call).
+[contract]
+id      = "robonix/skill/guided_tour/driver"
+version = "1"
+kind    = "skill"
+idl     = "lifecycle/srv/Driver.srv"
+description = "Lifecycle control interface for guided_tour skill."
+
+[mode]
+type = "rpc"

@@ -1,0 +1,13 @@
+# robonix/skill/guided_tour/run/status — poll tour progress.
+# Executor polls this between rounds to decide whether to wait or proceed.
+[contract]
+id      = "robonix/skill/guided_tour/run/status"
+version = "1"
+kind    = "skill"
+idl     = "guided_tour/srv/GetTourStatus.srv"
+
+[mode]
+type = "rpc"
+
+[semantics]
+user_invocable = true

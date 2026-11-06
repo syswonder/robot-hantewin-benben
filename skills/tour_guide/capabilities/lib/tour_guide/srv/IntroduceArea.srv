@@ -1,0 +1,6 @@
+# Placeholder single-RPC service for the tour_guide skill's MCP tool.
+# Replace the fields below with the real interface — the codegen step
+# derives IntroduceArea_Request / IntroduceArea_Response from this file.
+string area      # PLACEHOLDER: describe the argument the model passes
+---
+string narration # PLACEHOLDER: describe the result the skill returns

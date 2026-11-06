@@ -1,0 +1,27 @@
+manifestVersion: 1
+
+package:
+  name: robonix.skill.template.tour_guide
+  version: 0.1.0
+  description: Minimal skill template — owns its own contract, exposes one MCP tool.
+  tags: [skill, template]
+  maintainers:
+    - Syswonder <contact@syswonder.org>
+  license: MIT
+
+build: bash scripts/build.sh
+start: bash scripts/start.sh
+
+# Package contracts: skills own their interface (they ARE the new
+# capability, not an instance of an existing one) plus a `*/driver`
+# lifecycle contract (idl = lifecycle/srv/Driver.srv, resolved from the
+# robonix source tree). Both are picked up by `rbnx codegen -p . --mcp`;
+# the driver one is what lets `rbnx boot` fire Driver(CMD_INIT/ACTIVATE)
+# so on_init actually parses `config.areas`.
+capabilities:
+  - name: robonix/skill/tour_guide/driver
+    path: capabilities/driver.v1.toml
+  - name: robonix/skill/tour_guide/introduce
+    path: capabilities/tour_guide.v1.toml
+
+depends: []

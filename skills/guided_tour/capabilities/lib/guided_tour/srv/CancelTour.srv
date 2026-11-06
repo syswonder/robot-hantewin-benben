@@ -1,0 +1,6 @@
+# robonix/skill/guided_tour/run/cancel — abort the tour.
+# Also cancels the active nav2 goal. Empty `run_id` means the most recent tour.
+string run_id
+---
+bool accepted
+string detail
